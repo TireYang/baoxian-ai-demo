@@ -6,6 +6,29 @@
 
 ---
 
+## 在线访问
+
+| 方式 | 地址 | 适用 |
+|---|---|---|
+| 站点首页 | https://tireyang.github.io/baoxian-ai-demo/ | 默认，GitHub Pages（海外节点） |
+| 新版演示（桌面） | https://tireyang.github.io/baoxian-ai-demo/demo/index-ai.html | 直接进入新版 |
+| 新版演示（手机） | https://tireyang.github.io/baoxian-ai-demo/demo/index-ai.html?mobile=1 | 手机 / 真机 |
+| 上一版演示 | https://tireyang.github.io/baoxian-ai-demo/demo/index.html | 数字化系统对照 |
+| **离线包下载** | [baoxian-ai-demo-static.zip](https://github.com/TireYang/baoxian-ai-demo/releases/latest/download/baoxian-ai-demo-static.zip) | 国内网络 / 微信转发 / 内网 |
+
+> **访问不了 `*.github.io`？** 部分网络会屏蔽 GitHub Pages。两种绕过方式：
+> 1. 下载上面的**离线包**（101 KB），解压后双击 `index.html` —— 无需联网、无需安装；
+> 2. 直接把 **`demo/index-ai.html` 单文件**发给对方（约 200 KB），双击就是完整演示，含手机版。
+
+本地运行无需构建、无依赖：
+
+```bash
+open index.html            # macOS，双击同理
+python3 -m http.server 8080   # 或者起个静态服务
+```
+
+---
+
 ## 两个版本
 
 | 版本 | 入口 | 说明 |
@@ -75,20 +98,9 @@
 │   ├── index-ai.html               # ✦ 新版：AI Native（桌面版 + 手机版，10 个页面）
 │   ├── index.html                  # 上一版：数字化系统（9 个页面）
 │   └── AI_NATIVE_ANALYSIS.md       # 角色分析 / 设计原则 / 价值模型 / 落地建议
+├── favicon.svg / favicon.ico       # 站点图标
 ├── .nojekyll                       # 关闭 Jekyll 处理，直接静态托管
 └── README.md
-```
-
----
-
-## 本地运行
-
-无需构建、无需依赖，直接打开即可：
-
-```bash
-open index.html            # macOS
-# 或者起个静态服务
-python3 -m http.server 8080
 ```
 
 ---

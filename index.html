@@ -98,6 +98,8 @@ h3.sec{font-size:13px;letter-spacing:2px;color:var(--muted);font-weight:600;text
 
 .note{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;font-size:13px;color:var(--sub)}
 .note b{color:#dbe1f0}
+.note a.dl{display:inline-flex;align-items:center;gap:6px;margin:4px 0;padding:7px 14px;border-radius:10px;background:linear-gradient(135deg,#7c5cff,#a855f7);color:#fff;text-decoration:none;font-weight:600;font-size:13px;box-shadow:0 6px 18px rgba(124,92,255,.35)}
+.note a.dl:hover{filter:brightness(1.08)}
 .note code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:5px;padding:1.5px 6px;color:#c9d2ea}
 footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 footer a{color:var(--sub);text-decoration:none;border-bottom:1px dotted rgba(255,255,255,.25)}
@@ -146,6 +148,7 @@ footer a:hover{color:#fff}
       <div class="actions">
         <a class="btn btn-p" href="demo/index-ai.html">进入新版演示 →</a>
         <a class="btn btn-g" href="demo/index-ai.html?mobile=1">看手机版</a>
+        <a class="btn btn-g" href="https://github.com/TireYang/baoxian-ai-demo/releases/latest/download/baoxian-ai-demo-static.zip">⬇ 下载离线包</a>
       </div>
     </div>
 
@@ -227,6 +230,20 @@ footer a:hover{color:#fff}
       手机端底部有 5 个导航、右下 AI 浮球可唤起全屏 Copilot。<br>
       <b>角色视角</b>：点右上角头像可切换「总经理 / 客户经理 / 运营 / 合规风控」四种视角，菜单与数据范围实时刷新。<br>
       <b>说明</b>：全部数据为演示用模拟数据，不代表真实业绩；页面为单文件零依赖，可离线打开。
+    </div>
+  </section>
+
+  <section>
+    <h3 class="sec">打不开？三种备用方式</h3>
+    <div class="note">
+      <b>① 直连 GitHub Pages（海外节点）</b>：<code>https://tireyang.github.io/baoxian-ai-demo/</code><br>
+      如果提示超时 / 无法访问，通常是当前网络屏蔽了 GitHub 的 <code>*.github.io</code> 域名 —— 换下面两种方式。<br><br>
+      <b>② 下载离线包（推荐给国内网络 / 微信转发）</b>：
+      <a class="dl" href="https://github.com/TireYang/baoxian-ai-demo/releases/latest/download/baoxian-ai-demo-static.zip">⬇ baoxian-ai-demo-static.zip（101 KB）</a><br>
+      解压后双击 <code>index.html</code> 即可，<b>无需联网、无需安装、不依赖任何服务器</b>，两个版本 + 文档全部在内。<br><br>
+      <b>③ 单文件直接发同事</b>：新版就是一个文件 <code>demo/index-ai.html</code>（约 200 KB），
+      把它直接微信 / 邮件发出去，对方双击用浏览器打开就是完整演示（含手机版，窗口缩到 900px 以下自动切换）。<br><br>
+      <b>为什么要这样设计</b>：整套演示是<b>零依赖单文件</b>，不靠服务器、不靠 CDN、不装环境 —— 现场演示、客户机、内网离线环境都不会挂。
     </div>
   </section>
 
