@@ -14,11 +14,13 @@
 | 新版演示（桌面） | https://tireyang.github.io/baoxian-ai-demo/demo/index-ai.html | 直接进入新版 |
 | 新版演示（手机） | https://tireyang.github.io/baoxian-ai-demo/demo/index-ai.html?mobile=1 | 手机 / 真机 |
 | 上一版演示 | https://tireyang.github.io/baoxian-ai-demo/demo/index.html | 数字化系统对照 |
-| **离线包下载** | [baoxian-ai-demo-static.zip](https://github.com/TireYang/baoxian-ai-demo/releases/latest/download/baoxian-ai-demo-static.zip) | 国内网络 / 微信转发 / 内网 |
+| **离线包下载** | [baoxian-ai-demo-static.zip](https://tireyang.github.io/baoxian-ai-demo/baoxian-ai-demo-static.zip) | 国内网络 / 微信转发 / 内网 |
+| 离线包备用地址 | [raw.githubusercontent（国内较快）](https://raw.githubusercontent.com/TireYang/baoxian-ai-demo/main/baoxian-ai-demo-static.zip) · [GitHub Release](https://github.com/TireYang/baoxian-ai-demo/releases/latest) | 上一个打不开时用 |
 
-> **访问不了 `*.github.io`？** 部分网络会屏蔽 GitHub Pages。两种绕过方式：
-> 1. 下载上面的**离线包**（101 KB），解压后双击 `index.html` —— 无需联网、无需安装；
-> 2. 直接把 **`demo/index-ai.html` 单文件**发给对方（约 200 KB），双击就是完整演示，含手机版。
+> **访问不了 `*.github.io` 或 `github.com`？** 国内网络对 GitHub 各域名屏蔽情况不同（实测 `github.com` 与 Release 资源域名经常超时，而 `*.github.io` / `raw.githubusercontent.com` 通常可用）。三种绕过方式：
+> 1. 从 [Pages 站点直接下载离线包](https://tireyang.github.io/baoxian-ai-demo/baoxian-ai-demo-static.zip)（走 `*.github.io`，通常可用）；
+> 2. 换 [raw.githubusercontent 备用地址](https://raw.githubusercontent.com/TireYang/baoxian-ai-demo/main/baoxian-ai-demo-static.zip)（国内一般较快）；
+> 3. 直接把 **`demo/index-ai.html` 单文件**发给对方（约 200 KB），双击就是完整演示，含手机版。
 
 本地运行无需构建、无依赖：
 
