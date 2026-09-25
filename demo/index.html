@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>保E通 · 保险中介数字化系统（演示）</title>
+<style>
+:root{
+  --primary:#2f54eb;--primary-d:#1d39c4;--bg:#f5f6fa;--text:#1f2733;--muted:#86909c;
+  --border:#ebedf2;--sidebar-w:236px;--top-h:60px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;min-width:1180px;
+}
+::selection{background:rgba(47,84,235,.15)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#d4d9e6;border-radius:5px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ===== 布局骨架 ===== */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:var(--sidebar-w);position:fixed;top:0;bottom:0;left:0;z-index:40;
+  background:linear-gradient(180deg,#0d1440,#121b52 55%,#0d1440);
+  color:#b9c0e4;display:flex;flex-direction:column;
+}
+.logo{padding:19px 22px;display:flex;gap:11px;align-items:center;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo-mark{
+  width:36px;height:36px;border-radius:10px;flex:none;
+  background:linear-gradient(135deg,#2f54eb,#53a8ff);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;color:#fff;font-size:17px;box-shadow:0 4px 12px rgba(47,84,235,.45);
+}
+.logo-text b{color:#fff;font-size:16.5px;display:block;letter-spacing:.5px}
+.logo-text span{font-size:11px;color:#8f97c4}
+.menu{padding:14px 12px;flex:1;overflow-y:auto}
+.menu::-webkit-scrollbar{width:5px}
+.menu::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15)}
+.menu-group{font-size:11px;color:#66709f;padding:13px 12px 6px;letter-spacing:1px}
+.menu-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;
+  color:#b9c0e4;cursor:pointer;margin-bottom:2px;font-size:13.5px;transition:.18s;position:relative;
+}
+.menu-item svg{width:17px;height:17px;flex:none;opacity:.85}
+.menu-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.menu-item.active{background:rgba(47,84,235,.30);color:#fff;font-weight:600}
+.menu-item.active::before{
+  content:'';position:absolute;left:-12px;top:8px;bottom:8px;width:3px;
+  border-radius:0 3px 3px 0;background:#4a7bff;
+}
+.side-foot{padding:14px 20px;font-size:11px;color:#5d6590;border-top:1px solid rgba(255,255,255,.08);line-height:1.8}
+.main{margin-left:var(--sidebar-w);flex:1;min-width:0}
+
+/* ===== 顶部栏 ===== */
+.topbar{
+  height:var(--top-h);background:#fff;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;padding:0 24px;
+  position:sticky;top:0;z-index:30;
+}
+.crumbs{color:var(--muted);font-size:13px}
+.crumbs b{color:var(--text);font-weight:600}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.search{position:relative}
+.search svg{position:absolute;left:11px;top:9.5px;color:#9aa3b2;pointer-events:none}
+.search input{
+  width:250px;height:34px;border:1px solid var(--border);border-radius:17px;
+  padding:0 14px 0 33px;background:#f7f8fc;outline:none;transition:.2s;font-size:13px;color:var(--text);
+}
+.search input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(47,84,235,.12)}
+.bell{
+  position:relative;width:36px;height:36px;border-radius:9px;cursor:pointer;color:#5c6675;
+  display:flex;align-items:center;justify-content:center;transition:.18s;
+}
+.bell:hover{background:#f2f4fa;color:var(--primary)}
+.bell:active{transform:scale(.92)}
+.bell .dot{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:#f5222d;border:2px solid #fff}
+.user{display:flex;align-items:center;gap:9px;cursor:pointer;padding:5px 8px;border-radius:9px;transition:.18s}
+.user:hover{background:#f2f4fa}
+.user:active{transform:scale(.97)}
+.avatar{
+  width:32px;height:32px;border-radius:50%;flex:none;color:#fff;
+  background:linear-gradient(135deg,#2f54eb,#722ed1);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;
+}
+.user .name{font-size:13px;font-weight:600;line-height:1.3}
+.user .role{font-size:11px;color:var(--muted);line-height:1.2}
+
+/* ===== 内容区 ===== */
+.content{padding:22px 24px 44px;max-width:1560px}
+#view>*{animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.page-head h2{font-size:19px;font-weight:700}
+.page-head p{color:var(--muted);font-size:12.5px;margin-top:4px}
+.ph-r{display:flex;gap:10px}
+
+/* ===== 卡片与网格 ===== */
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 3px rgba(31,39,51,.04)}
+.card-h{padding:15px 18px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-h h3{font-size:14.5px;font-weight:600}
+.card-b{padding:14px 18px 18px}
+.hint{font-size:12px;color:#9aa3b2;font-weight:400}
+.grid{display:grid;gap:16px}
+.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.grid-2{grid-template-columns:minmax(0,1.9fr) minmax(0,1fr)}
+.grid-2b{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-p5{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:1200px){
+  .grid-4,.grid-p5{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid-2,.grid-2b{grid-template-columns:minmax(0,1fr)}
+}
+
+/* ===== KPI 卡片 ===== */
+.kpi{padding:18px;display:flex;gap:14px;align-items:flex-start;transition:.2s}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(31,39,51,.09)}
+.kpi-ic{width:42px;height:42px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center}
+.kpi-ic svg{width:21px;height:21px}
+.ic-blue{background:#edf3ff;color:#2f54eb}
+.ic-green{background:#f0faf0;color:#2f9e44}
+.ic-orange{background:#fff4e6;color:#e8590c}
+.ic-purple{background:#f6f0ff;color:#7048e8}
+.ic-cyan{background:#e6fcf9;color:#0c8599}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.kpi .v{font-size:22px;font-weight:700;margin:3px 0 7px;letter-spacing:.2px}
+.delta{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:11px}
+.delta.good{background:#f0faf0;color:#2f9e44}
+.delta.bad{background:#fff0f0;color:#e03131}
+
+/* ===== 统计条 ===== */
+.stat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px 16px;box-shadow:0 1px 3px rgba(31,39,51,.04)}
+.stat .l{font-size:12px;color:var(--muted)}
+.stat .v{font-size:19px;font-weight:700;margin-top:3px}
+.stat-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+
+/* ===== 表格 ===== */
+table{width:100%;border-collapse:collapse}
+th{background:#f8f9fd;color:#6b7280;font-weight:500;text-align:left;padding:10px 14px;font-size:12.5px;white-space:nowrap}
+td{padding:12px 14px;border-top:1px solid #f0f2f7;font-size:13px;vertical-align:middle}
+tbody tr{transition:.15s}
+.tbl-hover tbody tr:hover{background:#f6f8ff}
+tr.clickable{cursor:pointer}
+.table-wrap{overflow-x:auto}
+.num{font-variant-numeric:tabular-nums}
+.empty{text-align:center;color:#9aa3b2;padding:30px !important}
+.mini th{padding:8px 10px;font-size:12px}
+.mini td{padding:9px 10px;font-size:12.5px}
+.pay{color:var(--primary);font-weight:700}
+
+/* ===== 徽章 ===== */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;line-height:18px;white-space:nowrap}
+.b-green{background:#f0faf0;color:#2f9e44}
+.b-red{background:#fff0f0;color:#e03131}
+.b-blue{background:#edf3ff;color:#2f54eb}
+.b-gray{background:#f3f4f6;color:#6b7280}
+.b-orange{background:#fff4e6;color:#e8590c}
+.b-dark{background:#ececf4;color:#494960}
+.insurer{display:inline-flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap}
+.insurer i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.tag-p{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:5px;margin:1px 3px 1px 0;white-space:nowrap}
+.tp{background:#f6f0ff;color:#7048e8}
+.to{background:#fff4e6;color:#e8590c}
+.tg{background:#f0faf0;color:#2f9e44}
+.tb{background:#edf3ff;color:#2f54eb}
+.tag-s{font-size:11px;padding:1.5px 7px;border-radius:4px;margin-right:7px;white-space:nowrap}
+
+/* ===== 按钮 ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 15px;
+  border-radius:8px;border:1px solid transparent;font-size:13px;cursor:pointer;transition:.16s;
+  font-family:inherit;white-space:nowrap;
+}
+.btn-p{background:var(--primary);color:#fff}
+.btn-p:hover{background:var(--primary-d);transform:translateY(-1px);box-shadow:0 4px 10px rgba(47,84,235,.30)}
+.btn-p:active{transform:scale(.96)}
+.btn-g{background:#fff;border-color:#dde1ea;color:#3d4657}
+.btn-g:hover{border-color:var(--primary);color:var(--primary)}
+.btn-g:active{transform:scale(.96)}
+.btn-sm{height:28px;padding:0 11px;font-size:12px}
+.btn[disabled]{opacity:.65;cursor:default;transform:none !important;box-shadow:none !important}
+
+/* ===== 筛选栏 ===== */
+.filter-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.inp,.sel{
+  height:34px;border:1px solid #dde1ea;border-radius:8px;padding:0 12px;font-size:13px;
+  outline:none;background:#fff;color:#3d4657;transition:.15s;font-family:inherit;
+}
+.sel{cursor:pointer;padding-right:8px}
+.inp:focus,.sel:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(47,84,235,.12)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  padding:6px 14px;border-radius:18px;background:#fff;border:1px solid #dde1ea;
+  font-size:12.5px;cursor:pointer;color:#4b5563;transition:.15s;
+}
+.chip:hover{border-color:var(--primary);color:var(--primary)}
+.chip:active{transform:scale(.95)}
+.chip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+
+/* ===== 环形图 ===== */
+.donut-wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.donut{width:158px;height:158px;border-radius:50%;position:relative;flex:none}
+.donut::after{content:'';position:absolute;inset:27px;background:#fff;border-radius:50%;box-shadow:inset 0 0 0 1px #f0f2f7}
+.donut .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1}
+.donut .c b{font-size:21px}
+.donut .c span{font-size:12px;color:#8a93a6;margin-top:2px}
+.legend{display:flex;flex-direction:column;gap:9px;font-size:12.5px;flex:1;min-width:150px}
+.legend .li{display:flex;align-items:center;gap:8px}
+.legend i{width:9px;height:9px;border-radius:3px;flex:none}
+.legend .pct{margin-left:auto;color:#6b7280}
+.legend-h{display:flex;gap:14px;font-size:12px;color:#6b7280;flex-wrap:wrap}
+.legend-h .li{display:flex;align-items:center;gap:5px}
+.legend-h i{width:9px;height:9px;border-radius:3px}
+
+/* ===== 待办 ===== */
+.todo{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed #eef0f5}
+.todo:last-child{border-bottom:none}
+.todo-c{
+  width:19px;height:19px;border-radius:50%;border:1.5px solid #c6ccda;flex:none;cursor:pointer;
+  margin-top:1px;transition:.15s;position:relative;
+}
+.todo-c:hover{border-color:var(--primary)}
+.todo.done .todo-c{background:var(--primary);border-color:var(--primary)}
+.todo.done .todo-c::after{
+  content:'';position:absolute;left:5px;top:4.5px;width:6px;height:3.5px;
+  border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg);
+}
+.todo.done .tx{color:#9aa3b2;text-decoration:line-through}
+.todo .tx{font-size:13px;line-height:1.65}
+
+/* ===== AI ===== */
+.ai-card{background:linear-gradient(135deg,#f4f6ff,#faf5ff);border-color:#e3e6fb}
+.ai-p{font-size:13px;line-height:1.95;color:#3d4657;text-align:justify}
+.ai-badge{
+  background:linear-gradient(90deg,#2f54eb,#722ed1);color:#fff;font-size:11px;
+  padding:2.5px 9px;border-radius:5px;letter-spacing:.5px;white-space:nowrap;
+}
+.ai-banner{
+  display:flex;align-items:center;gap:12px;padding:13px 18px;margin-bottom:16px;
+  background:linear-gradient(90deg,#eef2ff,#f8f0ff);border-color:#dfe5fb;font-size:13px;
+}
+.ai-banner>div{flex:1;line-height:1.7}
+.ai-advice{background:#f4f6ff;border:1px solid #dfe5fb;border-radius:10px;padding:14px;margin-top:18px}
+.ai-advice p{font-size:13px;line-height:1.85;margin-top:9px;color:#3d4657}
+
+/* ===== 续保 ===== */
+.rn-group{margin-bottom:20px}
+.rn-title{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;margin:0 0 11px 2px}
+.rn-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.rn-item{
+  display:flex;align-items:center;gap:16px;padding:13px 16px;border:1px solid var(--border);
+  border-left:4px solid;border-radius:10px;background:#fff;margin-bottom:10px;transition:.18s;flex-wrap:wrap;
+}
+.rn-item:hover{box-shadow:0 4px 14px rgba(31,39,51,.08);transform:translateY(-1px)}
+.rn-red{border-left-color:#e03131}
+.rn-orange{border-left-color:#e8590c}
+.rn-gray{border-left-color:#adb5bd}
+.rn-main{width:180px;flex:none}
+.rn-main .rn-no{display:block;font-size:12px;color:#9aa3b2;margin:2px 0}
+.rn-sub{font-size:12.5px;color:#5c6675}
+.rn-date{width:92px;flex:none;text-align:center;font-size:13px;font-weight:600}
+.rn-date div:last-child{font-size:11px;color:#9aa3b2;font-weight:400;margin-top:2px}
+.rn-cond{flex:1;min-width:230px;font-size:12px;line-height:1.75;color:#5c6675;display:flex;flex-direction:column}
+.rn-cond b{color:#3d4657;font-size:12.5px}
+.rn-note{color:#9aa3b2}
+
+/* ===== 评分条 ===== */
+.score{display:flex;align-items:center;gap:8px}
+.score-track{width:66px;height:6px;border-radius:3px;background:#eef0f5;overflow:hidden;flex:none}
+.score-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2f54eb,#53a8ff);transition:.3s}
+.score-fill.hot{background:linear-gradient(90deg,#e03131,#f08c00)}
+.score-fill.cold{background:#c3c9d4}
+
+/* ===== 渠道条形图 ===== */
+.cv-row{display:grid;grid-template-columns:110px 1fr 58px;align-items:center;gap:12px;margin-bottom:13px;font-size:13px}
+.cv-row:last-child{margin-bottom:0}
+.cv-track{height:14px;background:#f0f2f7;border-radius:7px;overflow:hidden}
+.cv-fill{height:100%;border-radius:7px;background:linear-gradient(90deg,#53a8ff,#2f54eb);transition:width .6s}
+.cv-row:hover .cv-fill{filter:brightness(1.1)}
+.cv-val{text-align:right}
+
+/* ===== 利润 ===== */
+.pcard{padding:15px 18px}
+.pcard .l{font-size:12px;color:var(--muted)}
+.pcard .v{font-size:19px;font-weight:700;margin-top:5px}
+.pcard.ok{background:#f0faf0;border-color:#cdeed3}
+.pcard.ok .v{color:#2b8a3e}
+.pf-chart{display:flex;align-items:flex-end;justify-content:space-around;gap:20px;height:236px;padding:28px 10px 0;border-bottom:1px solid #eef0f5}
+.pf-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.pf-bar{width:64px;border-radius:8px 8px 0 0;position:relative;transition:.2s;min-height:12px}
+.pf-bar:hover{filter:brightness(1.07)}
+.pf-bar span{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:600;white-space:nowrap;color:#3d4657}
+.pf-name{font-size:12px;color:#6b7280;margin-top:9px;text-align:center}
+.pf-formula{margin-top:14px;font-size:12.5px;color:#6b7280;background:#f8f9fd;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.7}
+
+/* ===== 工作量 ===== */
+.wl-row{display:grid;grid-template-columns:76px 1fr 56px;align-items:center;gap:12px;margin-bottom:13px;font-size:13px}
+.wl-row:last-child{margin-bottom:0}
+.wl-track{display:flex;height:20px;border-radius:6px;overflow:hidden;background:#f0f2f7}
+.wl-seg{height:100%;transition:.2s}
+.wl-seg:hover{filter:brightness(1.12)}
+.wl-t{font-size:12px;color:#6b7280;text-align:right}
+
+/* ===== 抽屉 ===== */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.overlay.show{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:450px;max-width:93vw;background:#fff;z-index:70;
+  transform:translateX(106%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;box-shadow:-8px 0 24px rgba(15,23,42,.12);
+}
+.drawer.show{transform:none}
+.drawer-h{padding:17px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.drawer-title{font-size:15px;font-weight:700;line-height:1.5}
+.drawer-b{padding:18px 20px;overflow-y:auto;flex:1}
+.drawer-f{padding:13px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+.x-btn{
+  width:30px;height:30px;border-radius:8px;border:none;background:#f3f4f8;color:#5c6675;
+  cursor:pointer;font-size:14px;transition:.15s;flex:none;
+}
+.x-btn:hover{background:#e7e9f2;color:var(--text)}
+.x-btn:active{transform:scale(.92)}
+.d-name{font-size:18px;font-weight:700}
+.d-meta{font-size:12px;color:#8a93a6;font-weight:400;margin-left:9px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px 18px}
+.info-grid .it{font-size:13px;line-height:1.5}
+.info-grid .k{color:#8a93a6;font-size:12px;margin-bottom:2px}
+.sec-t{font-size:13.5px;font-weight:600;margin:20px 0 11px;display:flex;align-items:center;gap:7px}
+.sec-t::before{content:'';width:3px;height:13px;border-radius:2px;background:var(--primary)}
+.tl{position:relative;padding-left:21px}
+.tl::before{content:'';position:absolute;left:5.5px;top:7px;bottom:7px;width:2px;background:#e8ecf5}
+.tl-item{position:relative;padding-bottom:17px}
+.tl-item:last-child{padding-bottom:2px}
+.tl-item::before{
+  content:'';position:absolute;left:-21px;top:4px;width:10px;height:10px;border-radius:50%;
+  background:#fff;border:2.5px solid var(--primary);
+}
+.tl-date{font-size:12px;color:#8a93a6}
+.tl-x{font-size:13px;margin-top:3px;line-height:1.65}
+
+/* ===== 弹窗 ===== */
+.modal-wrap{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.45);padding:20px}
+.modal-wrap.show{display:flex}
+.modal{width:540px;max-width:94vw;max-height:88vh;overflow-y:auto;animation:pop .22s}
+@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-h{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-h h3{font-size:15px}
+.modal-b{padding:18px 20px}
+.modal-f{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field label{display:block;font-size:12px;color:#5c6675;margin-bottom:5px}
+.field input,.field select{
+  width:100%;height:36px;border:1px solid #dde1ea;border-radius:8px;padding:0 10px;
+  font-size:13px;outline:none;font-family:inherit;color:#3d4657;background:#fff;
+}
+.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(47,84,235,.12)}
+
+/* ===== 角色权限（演示） ===== */
+.ro-banner{display:flex;align-items:center;gap:9px;background:#fffbe6;border:1px solid #ffe58f;color:#ad6800;border-radius:10px;padding:10px 15px;font-size:12.5px;margin-bottom:14px}
+.ro-banner svg{width:15px;height:15px;flex:none}
+.role-opt{display:flex;gap:13px;align-items:flex-start;padding:13px 14px;border:1.5px solid #e6e9f2;border-radius:10px;margin-bottom:11px;cursor:pointer;transition:.15s}
+.role-opt:hover{border-color:var(--primary);background:#f7f9ff}
+.role-opt.on{border-color:var(--primary);background:#f0f5ff;box-shadow:0 0 0 3px rgba(47,84,235,.10)}
+.role-opt .ra{width:38px;height:38px;border-radius:10px;flex:none;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600}
+.role-opt b{font-size:13.5px;display:block}
+.role-opt p{font-size:12px;color:#8a93a6;margin-top:3px;line-height:1.6}
+.ro-check{margin-left:auto;color:var(--primary);font-weight:700;opacity:0;flex:none;align-self:center}
+.role-opt.on .ro-check{opacity:1}
+
+/* ===== Toast ===== */
+#toast-root{position:fixed;top:74px;left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none}
+.toast{
+  display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--border);
+  border-radius:10px;padding:10px 17px;font-size:13px;color:#3d4657;
+  box-shadow:0 8px 24px rgba(15,23,42,.14);animation:tin .28s;max-width:480px;
+}
+.toast.out{animation:tout .3s forwards}
+@keyframes tin{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+@keyframes tout{to{opacity:0;transform:translateY(-10px)}}
+.t-ic{width:18px;height:18px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center}
+.t-success .t-ic{background:#2f9e44}
+.t-info .t-ic{background:#2f54eb}
+.t-warn .t-ic{background:#e8590c}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">保</div>
+      <div class="logo-text"><b>保E通</b><span>保险中介数字化系统</span></div>
+    </div>
+    <nav class="menu" id="menu"></nav>
+    <div class="side-foot">保E通 v2.4.1 · 内部演示环境<br>页面数据均为模拟数据<br>点击右上角头像可切换演示角色</div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="crumbs" id="crumb">工作台 / <b>经营驾驶舱</b></div>
+      <div class="top-right">
+        <div class="search">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-3.8-3.8"/></svg>
+          <input id="g-search" placeholder="搜索客户姓名 / 电话，回车跳转客户管理">
+        </div>
+        <div class="bell" id="bell" title="通知中心">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9"/><path d="M10 19a2.2 2.2 0 0 0 4 0"/></svg>
+          <span class="dot"></span>
+        </div>
+        <div class="user" id="user" title="点击切换演示角色">
+          <div class="avatar" id="u-avatar">管</div>
+          <div><div class="name" id="u-name">周立群</div><div class="role" id="u-role">系统管理员</div></div>
+        </div>
+      </div>
+    </header>
+    <main class="content" id="view"></main>
+  </div>
+</div>
+
+<div class="overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-h">
+    <div class="drawer-title" id="drawer-title">详情</div>
+    <button class="x-btn" id="drawer-close">✕</button>
+  </div>
+  <div class="drawer-b" id="drawer-body"></div>
+  <div class="drawer-f" id="drawer-f">
+    <button class="btn btn-g" id="d-call">拨打电话</button>
+    <button class="btn btn-p" id="d-wx">发送微信提醒</button>
+  </div>
+</aside>
+<div class="modal-wrap" id="modal-wrap"></div>
+<div id="toast-root"></div>
+
+<script>
+/* ================= 基础工具 ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const fmt = n => Number(n).toLocaleString('zh-CN');
+const money = n => '¥' + fmt(n);
+const TODAY = '2026-09-22';
+const dleft = d => Math.round((new Date(d + 'T00:00:00') - new Date(TODAY + 'T00:00:00')) / 864e5);
+const esc = s => String(s == null ? '' : s).replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+const badge = (t, c) => `<span class="badge ${c}">${t}</span>`;
+const insBadge = n => `<span class="insurer"><i style="background:${INSCOLOR[n]}"></i>${n}</span>`;
+
+/* ================= 图标（内联 SVG） ================= */
+const I = {
+  dash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.4"/><path d="M3.5 19.5c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="17" cy="9" r="2.6"/><path d="M15.8 14.7c2.5.2 4.2 1.6 4.7 4.1"/></svg>',
+  file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3.5h8L19 8.5V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M13.5 4V9H19"/><path d="M9 13h6M9 16.5h6"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 7.9-7.5 9.5-4.3-1.6-7.5-4.9-7.5-9.5V6z"/><path d="M9 11.8l2.2 2.2 4-4.2"/></svg>',
+  share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="12" r="2.6"/><circle cx="17.5" cy="5.5" r="2.6"/><circle cx="17.5" cy="18.5" r="2.6"/><path d="M8.4 10.8l6.8-4M8.4 13.2l6.8 4"/></svg>',
+  coins:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6"/><path d="M4.5 12v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6"/></svg>',
+  case:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="7.5" width="17" height="12.5" rx="2"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3.5 12.5h17"/></svg>'
+};
+
+/* ================= Mock 数据 ================= */
+const INSURERS = ['太平人寿','阳光财险','平安财险','人保寿险','泰康人寿'];
+const INSCOLOR = {'太平人寿':'#2f54eb','阳光财险':'#fa8c16','平安财险':'#f5222d','人保寿险':'#722ed1','泰康人寿':'#13c2c2'};
+const PST = {'生效中':'b-green','已到期':'b-red','已续保':'b-blue','退保':'b-gray'};
+const CST = {'已报案':'b-orange','审核中':'b-blue','已结案':'b-green'};
+const LST = {'高意向':'b-red','跟进中':'b-blue','待跟进':'b-gray','已流失':'b-dark'};
+const TAGC = {'高净值':'tp','车险到期':'to','家庭客户':'tg','新客':'tb'};
+
+const CUSTOMERS = [
+  {id:1,  name:'张伟民', phone:'139 0101 2233', gender:'男', age:42, city:'上海市 浦东新区', tags:['高净值','车险到期'], lastFollow:'2026-09-20', owner:'王雅静', remark:'私营企业主，经营建材贸易公司，家庭年缴保费能力强'},
+  {id:2,  name:'李淑芬', phone:'137 2233 8899', gender:'女', age:36, city:'上海市 静安区',   tags:['家庭客户'],        lastFollow:'2026-09-18', owner:'李文博', remark:'两个孩子的母亲，关注家庭医疗保障'},
+  {id:3,  name:'陈志强', phone:'136 5566 1122', gender:'男', age:48, city:'苏州市 工业园区', tags:['车险到期'],        lastFollow:'2026-09-20', owner:'陈思远', remark:'物流公司车队负责人，名下 6 辆货车'},
+  {id:4,  name:'王芳',   phone:'135 6677 3344', gender:'女', age:33, city:'杭州市 西湖区',   tags:['家庭客户'],        lastFollow:'2026-09-15', owner:'赵晓芸', remark:'小学教师，关注重疾与医疗补充'},
+  {id:5,  name:'刘建国', phone:'138 9900 5566', gender:'男', age:55, city:'上海市 徐汇区',   tags:['高净值'],          lastFollow:'2026-09-10', owner:'王雅静', remark:'退休高管，有资产传承与养老规划需求'},
+  {id:6,  name:'赵敏',   phone:'159 1122 7788', gender:'女', age:29, city:'上海市 闵行区',   tags:['新客'],            lastFollow:'2026-09-21', owner:'孙鹏',   remark:'互联网公司产品经理，首次投保'},
+  {id:7,  name:'周杰',   phone:'186 3344 9900', gender:'男', age:31, city:'南京市 建邺区',   tags:['新客'],            lastFollow:'2026-09-19', owner:'陈思远', remark:'自主创业做电商，预算敏感'},
+  {id:8,  name:'孙丽华', phone:'133 4455 6677', gender:'女', age:51, city:'上海市 黄浦区',   tags:['高净值','家庭客户'],lastFollow:'2026-09-16', owner:'王雅静', remark:'全职太太，丈夫为企业股东'},
+  {id:9,  name:'吴桂兰', phone:'189 7788 2233', gender:'女', age:45, city:'南通市 崇川区',   tags:['新客'],            lastFollow:'2026-09-14', owner:'赵晓芸', remark:'个体工商户，经邻居介绍而来'},
+  {id:10, name:'郑凯',   phone:'150 8877 4455', gender:'男', age:38, city:'上海市 嘉定区',   tags:['车险到期'],        lastFollow:'2026-09-20', owner:'李文博', remark:'汽车零部件公司销售总监'}
+];
+
+const POLICIES = [
+  {no:'TP2026080112', cid:1,  ins:'太平人寿', type:'年金保险',       premium:120000, rate:0.08, start:'2025-09-28', end:'2026-09-27', status:'生效中', prev:115000, coverage:'年领 6.8 万，保证领取 20 年',        note:'去年无理赔，续保预计维持原费率'},
+  {no:'YG2026100945', cid:1,  ins:'阳光财险', type:'机动车商业险',   premium:6850,   rate:0.12, start:'2025-10-15', end:'2026-10-14', status:'生效中', prev:6520,   coverage:'车损 + 三者 200 万 + 座位险',      note:'去年出险 0 次，可享无赔优待'},
+  {no:'PA2025090341', cid:2,  ins:'平安财险', type:'机动车商业险',   premium:5280,   rate:0.11, start:'2025-09-25', end:'2026-09-24', status:'生效中', prev:5680,   coverage:'车损 + 三者 100 万',               note:'上年出险 1 次，保费预计上浮约 5%'},
+  {no:'RB2026110788', cid:3,  ins:'人保寿险', type:'重大疾病保险',   premium:15800,  rate:0.20, start:'2025-11-11', end:'2026-11-10', status:'生效中', prev:15800,  coverage:'重疾保额 50 万，轻症 3 次赔付',     note:'续保无等待期，费率不变'},
+  {no:'TK2026110123', cid:4,  ins:'泰康人寿', type:'百万医疗保险',   premium:3260,   rate:0.15, start:'2025-11-20', end:'2026-11-19', status:'生效中', prev:3100,   coverage:'一般医疗 300 万，重疾医疗 600 万', note:'客户年龄跨档，保费小幅上调'},
+  {no:'TP2027030278', cid:5,  ins:'太平人寿', type:'终身寿险',       premium:30000,  rate:0.10, start:'2026-03-10', end:'2027-03-09', status:'生效中'},
+  {no:'PA2027040566', cid:6,  ins:'平安财险', type:'家庭财产保险',   premium:1280,   rate:0.10, start:'2026-09-12', end:'2027-09-11', status:'生效中'},
+  {no:'YG2026070199', cid:3,  ins:'阳光财险', type:'机动车商业险',   premium:4600,   rate:0.12, start:'2025-07-01', end:'2026-06-30', status:'已到期'},
+  {no:'RB2026090877', cid:8,  ins:'人保寿险', type:'年金保险',       premium:50000,  rate:0.08, start:'2025-09-30', end:'2026-09-29', status:'生效中', prev:50000,  coverage:'第 3 个保单年度，可附万能账户',    note:'建议搭配万能账户提升收益预期'},
+  {no:'TK2026080145', cid:7,  ins:'泰康人寿', type:'重大疾病保险',   premium:9600,   rate:0.18, start:'2025-08-15', end:'2026-08-14', status:'已到期'},
+  {no:'TP2027070333', cid:9,  ins:'太平人寿', type:'百万医疗保险',   premium:2880,   rate:0.14, start:'2026-09-05', end:'2027-09-04', status:'生效中'},
+  {no:'PA2027100990', cid:10, ins:'平安财险', type:'机动车商业险',   premium:7350,   rate:0.11, start:'2025-10-20', end:'2026-10-19', status:'生效中', prev:7800,   coverage:'车损 + 三者 300 万 + 医保外用药',  note:'上年出险 0 次，续保预计降价约 6%'},
+  {no:'RB2027020456', cid:2,  ins:'人保寿险', type:'定期寿险',       premium:22000,  rate:0.12, start:'2026-02-18', end:'2027-02-17', status:'生效中'},
+  {no:'RB2026091022', cid:2,  ins:'人保寿险', type:'定期寿险',       premium:8000,   rate:0.12, start:'2026-09-08', end:'2027-09-07', status:'生效中', note:'先生加保件，9 月新承保'},
+  {no:'TK2026060455', cid:7,  ins:'泰康人寿', type:'住院医疗保险',   premium:2100,   rate:0.13, start:'2025-06-10', end:'2026-06-09', status:'已续保'},
+  {no:'TP2027040788', cid:10, ins:'太平人寿', type:'年金保险',       premium:35000,  rate:0.08, start:'2025-04-15', end:'2026-04-14', status:'退保'}
+];
+
+const FOLLOWUPS = {
+  1:[{d:'2026-09-20',t:'微信',x:'发送 2026 版年金计划书，客户对万能账户结算利率较关注，约定国庆后面谈',o:'王雅静'},
+     {d:'2026-09-12',t:'面谈',x:'到公司做家庭财务梳理，明确养老储备目标约 300 万',o:'王雅静'},
+     {d:'2026-08-30',t:'电话',x:'回访车辆使用体验，客户对上年理赔响应速度表示满意',o:'李文博'}],
+  2:[{d:'2026-09-18',t:'电话',x:'沟通车险续保方案，告知上年出险对保费的影响，客户接受报价',o:'李文博'},
+     {d:'2026-09-05',t:'微信',x:'发送定期寿险责任说明，客户为丈夫咨询加保',o:'李文博'}],
+  3:[{d:'2026-09-20',t:'电话',x:'同步车损理赔进度，告知预计 3 个工作日内到账',o:'陈思远'}],
+  4:[{d:'2026-09-15',t:'面谈',x:'讲解百万医疗续保条款变化，提醒免赔额维持 1 万不变',o:'赵晓芸'}],
+  5:[{d:'2026-09-10',t:'电话',x:'沟通增额终身寿减保规则，客户倾向 5 年交方案',o:'王雅静'}],
+  6:[{d:'2026-09-21',t:'微信',x:'发送家财险电子保单及理赔指引，客户确认收到',o:'孙鹏'}],
+  7:[{d:'2026-09-19',t:'电话',x:'住院医疗已续保成功，顺带推荐百万医疗，客户称预算有限待考虑',o:'陈思远'}],
+  8:[{d:'2026-09-16',t:'面谈',x:'梳理家庭现有 4 张保单，建议补充投保人豁免责任',o:'王雅静'}],
+  9:[{d:'2026-09-14',t:'电话',x:'回访医疗险使用情况，客户未出险，对续保价格较敏感',o:'赵晓芸'}],
+  10:[{d:'2026-09-20',t:'微信',x:'发送车险续保报价（含医保外用药责任），客户希望再对比两家',o:'李文博'}]
+};
+
+const AI_ADVICE = {
+  1:'客户年金险 9 月 27 日到期且为高净值企业主，建议 3 天内以「养老现金流规划」约访面谈，主推增额终身寿＋万能账户组合，预计件均保费 15 万以上；同步推进 10 月 14 日到期的车险续保。',
+  2:'平安车险 9 月 24 日到期（仅剩 2 天），今日务必发送续保支付链接并电话确认；可顺势为其先生推荐定期寿险加保（预计年缴 8,000 元）。',
+  3:'名下货车保险已脱保，存在保障空窗风险，建议今日加急报价并强调脱保后果；人保重疾险 11 月 10 日到期可提前铺垫续保。',
+  4:'百万医疗 11 月 19 日到期，客户年龄跨档保费小幅上调，建议提前 30 天用「续保无等待期」话术沟通，并推荐附加重疾豁免责任。',
+  5:'高净值退休高管，倾向 5 年交增额终身寿，建议携带现金价值演示表本周面访；可邀请参加本月高端客户养老沙龙。',
+  6:'新客首单家财险，30 天内是加保黄金期，建议推送百万医疗入门款（年缴约 900 元），AI 预估转化率 45%。',
+  7:'新客预算敏感，医疗险已续保成功，建议先用百元级意外险建立信任，3 个月后再二次开发重疾险。',
+  8:'年金险 9 月 29 日到期，建议搭配万能账户提升收益预期；家庭保单梳理显示可补充投保人豁免责任。',
+  9:'客户对医疗险价格敏感，建议强调续保稳定性与理赔服务差异，可推荐家庭单折扣方案锁定全家保障。',
+  10:'车险 10 月 19 日到期，客户处于比价阶段，建议突出医保外用药责任与送检服务，48 小时内二次触达；历史退保记录提示需加强缴费能力核验。'
+};
+
+const LEADS = [
+  {name:'马俊峰', intent:'重大疾病保险', src:'抖音线索',   last:'2026-09-21', times:3, score:86, st:'高意向', owner:'陈思远'},
+  {name:'林晓彤', intent:'年金保险',     src:'老客户加保', last:'2026-09-19', times:4, score:92, st:'高意向', owner:'王雅静'},
+  {name:'邓国栋', intent:'养老年金保险', src:'张三转介绍', last:'2026-09-21', times:2, score:81, st:'高意向', owner:'王雅静'},
+  {name:'谢建华', intent:'终身寿险',     src:'张三转介绍', last:'2026-09-18', times:5, score:78, st:'跟进中', owner:'王雅静'},
+  {name:'彭丽',   intent:'重大疾病保险', src:'老客户加保', last:'2026-09-20', times:3, score:74, st:'跟进中', owner:'陈思远'},
+  {name:'高志明', intent:'机动车商业险', src:'4S店合作',   last:'2026-09-20', times:2, score:68, st:'跟进中', owner:'李文博'},
+  {name:'罗美玲', intent:'百万医疗保险', src:'自然到店',   last:'2026-09-15', times:1, score:45, st:'待跟进', owner:'孙鹏'},
+  {name:'曹阳',   intent:'家庭财产保险', src:'自然到店',   last:'2026-09-08', times:2, score:40, st:'已流失', owner:'赵晓芸'},
+  {name:'韩雪梅', intent:'机动车商业险', src:'抖音线索',   last:'2026-09-10', times:1, score:32, st:'已流失', owner:'孙鹏'}
+];
+
+const CLAIMS = [
+  {no:'CL2026090123', cid:1,  pol:'TP2026080112', ins:'太平人寿', date:'2026-09-05', amt:12000, st:'审核中'},
+  {no:'CL2026090567', cid:7,  pol:'TK2026080145', ins:'泰康人寿', date:'2026-09-20', amt:25000, st:'审核中'},
+  {no:'CL2026090345', cid:3,  pol:'YG2026070199', ins:'阳光财险', date:'2026-09-18', amt:15000, st:'已报案'},
+  {no:'CL2026090789', cid:6,  pol:'PA2027040566', ins:'平安财险', date:'2026-09-21', amt:2000,  st:'已报案'},
+  {no:'CL2026080876', cid:2,  pol:'PA2025090341', ins:'平安财险', date:'2026-08-28', amt:6800,  st:'已结案'},
+  {no:'CL2026070234', cid:4,  pol:'TK2026110123', ins:'泰康人寿', date:'2026-07-22', amt:3200,  st:'已结案'}
+];
+
+const CHANNELS = [
+  {name:'张三转介绍', leads:42, deals:11, premium:452000},
+  {name:'4S店合作',   leads:35, deals:8,  premium:318000},
+  {name:'老客户加保', leads:19, deals:7,  premium:389000},
+  {name:'自然到店',   leads:28, deals:5,  premium:166000},
+  {name:'抖音线索',   leads:64, deals:6,  premium:98000}
+];
+
+const EMPLOYEES = [
+  {name:'王雅静', role:'业务主管', newBiz:3, renew:5, follow:8, archive:4, claim:1, month:162000, fc:10500, rc:2800,  k:1.20},
+  {name:'李文博', role:'客户经理', newBiz:2, renew:3, follow:6, archive:5, claim:0, month:107000, fc:7800,  rc:1900,  k:1.10},
+  {name:'陈思远', role:'客户经理', newBiz:1, renew:2, follow:9, archive:3, claim:2, month:83000,  fc:6400,  rc:1500,  k:1.00},
+  {name:'赵晓芸', role:'客户经理', newBiz:2, renew:4, follow:7, archive:6, claim:1, month:97000,  fc:7100,  rc:2100,  k:1.15},
+  {name:'孙鹏',   role:'客户经理', newBiz:0, renew:1, follow:4, archive:2, claim:0, month:37300,  fc:2600,  rc:800,   k:0.90}
+];
+
+const TREND = [{m:'4月',v:38.2},{m:'5月',v:42.6},{m:'6月',v:51.3},{m:'7月',v:46.8},{m:'8月',v:55.1},{m:'9月',v:48.6}];
+const DONUT = [
+  {n:'太平人寿', v:32, c:'#2f54eb'},
+  {n:'平安财险', v:24, c:'#f5222d'},
+  {n:'人保寿险', v:18, c:'#722ed1'},
+  {n:'泰康人寿', v:15, c:'#13c2c2'},
+  {n:'阳光财险', v:11, c:'#fa8c16'}
+];
+const TODOS = [
+  {tag:'到期提醒', tc:'to', x:'李淑芬 平安车险 9 月 24 日到期，需立即跟进续保'},
+  {tag:'高意向',   tc:'tp', x:'14:00 马俊峰重疾险面谈，已发送公司定位'},
+  {tag:'理赔',     tc:'tb', x:'周杰 2.5 万元理赔补充材料待提交泰康'},
+  {tag:'续保',     tc:'tg', x:'王芳百万医疗续保方案待客户确认'}
+];
+const AI_REPORT = '截至 9 月 22 日，本月累计保费 48.63 万元，完成月度目标的 81.1%，环比增长 12.4%。车险续保进入高峰期：未来 30 天内有 5 张保单到期，其中李淑芬（9 月 24 日）、张伟民（9 月 27 日）需在 48 小时内触达。渠道端「张三转介绍」转化率 26.2% 最高，建议加大多增激励；「抖音线索」线索量最大但转化仅 9.4%，建议优化首呼话术。本周业务员跟进次数达标率 100%，但孙鹏新增承保挂零，建议主管安排一对一陪访帮扶。';
+const PROFIT = {premium:486300, settle:87534, cost:32000};
+const cust = id => CUSTOMERS.find(c => c.id === id);
+const SENT = new Set();
+
+/* ================= 角色与权限（演示） =================
+   对应实现方案权限矩阵：admin 全部 / agent 仅本人数据+本人分成 /
+   finance 业务只读+全量分成利润 / ops 全业务+工作量只读 */
+const ROLES = {
+  admin:   {key:'admin',   avatar:'管', uname:'周立群', urole:'系统管理员', color:'linear-gradient(135deg,#2f54eb,#722ed1)',
+            desc:'拥有全部菜单与操作权限，可查看全员数据、公司利润与员工工作量',
+            menus:['dashboard','crm','policies','renewals','leads','claims','channels','profit','workload'],
+            write:true, scope:null, profit:'all'},
+  agent:   {key:'agent',   avatar:'李', uname:'李文博', urole:'客户经理',   color:'linear-gradient(135deg,#0c8599,#2f9e44)',
+            desc:'仅可见本人名下客户 / 保单 / 线索并办理业务；分成页仅显示本人数据，公司利润不可见',
+            menus:['dashboard','crm','policies','renewals','leads','claims','channels','profit'],
+            write:true, scope:'李文博', profit:'self'},
+  finance: {key:'finance', avatar:'钱', uname:'钱晓芸', urole:'财务专员',   color:'linear-gradient(135deg,#e8590c,#fa8c16)',
+            desc:'业务数据全部只读（操作按钮已隐藏）；可查看全量业务员分成与公司利润报表',
+            menus:['dashboard','crm','policies','renewals','leads','claims','channels','profit'],
+            write:false, scope:null, profit:'all'},
+  ops:     {key:'ops',     avatar:'吴', uname:'吴敏',   urole:'运营专员',   color:'linear-gradient(135deg,#7048e8,#b197fc)',
+            desc:'可办理全部业务；员工工作量统计只读；不可见分成与利润',
+            menus:['dashboard','crm','policies','renewals','leads','claims','channels','workload'],
+            write:true, scope:null, profit:null}
+};
+let roleKey = 'admin';
+let ROLE = ROLES[roleKey];
+
+/* 按当前角色做数据行级隔离（仅业务员生效，演示用） */
+function scopedCustomers(){ return ROLE.scope ? CUSTOMERS.filter(c => c.owner === ROLE.scope) : CUSTOMERS; }
+function scopedPolicies(){ const ids = new Set(scopedCustomers().map(c => c.id)); return POLICIES.filter(p => ids.has(p.cid)); }
+function scopedLeads(){ return ROLE.scope ? LEADS.filter(l => l.owner === ROLE.scope) : LEADS; }
+function scopedClaims(){ const ids = new Set(scopedCustomers().map(c => c.id)); return CLAIMS.filter(x => ids.has(x.cid)); }
+/* 只读角色页面顶部的权限提示条 */
+function roBanner(){
+  return ROLE.write ? '' :
+    '<div class="ro-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>当前为「' + ROLE.urole + '」只读视角，仅可查看数据，新增 / 发送类操作已隐藏</div>';
+}
+
+/* ================= 通用组件 ================= */
+function toast(msg, type){
+  type = type || 'success';
+  const icons = {
+    success:'<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M4 12.5l5 5L20 6.5"/></svg>',
+    info:'<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v9M12 17.4v.5"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 6v7M12 17.3v.6"/></svg>'
+  };
+  const el = document.createElement('div');
+  el.className = 'toast t-' + type;
+  el.innerHTML = '<span class="t-ic">' + icons[type] + '</span><span>' + esc(msg) + '</span>';
+  $('#toast-root').appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, 2400);
+}
+function openDrawer(title, body, mode){
+  $('#drawer-title').innerHTML = title;
+  $('#drawer-body').innerHTML = body;
+  const f = $('#drawer-f');
+  if(!ROLE.write){
+    f.innerHTML = '<span class="hint">只读权限，无法执行操作</span>';
+    f.style.justifyContent = 'flex-start';
+  } else if(mode === 'policy'){
+    f.style.justifyContent = 'flex-end';
+    f.innerHTML = '<button class="btn btn-p" id="d-contact">联系投保人</button>';
+    $('#d-contact').onclick = () => toast('演示环境：已模拟联系投保人', 'info');
+  } else {
+    f.style.justifyContent = 'flex-end';
+    f.innerHTML = '<button class="btn btn-g" id="d-call">拨打电话</button><button class="btn btn-p" id="d-wx">发送微信提醒</button>';
+    $('#d-call').onclick = () => toast('演示环境：已模拟拨打电话', 'info');
+    $('#d-wx').onclick = () => toast('演示环境：微信提醒已发送', 'success');
+  }
+  $('#drawer').classList.add('show');
+  $('#drawer-overlay').classList.add('show');
+}
+function closeDrawer(){
+  $('#drawer').classList.remove('show');
+  $('#drawer-overlay').classList.remove('show');
+}
+function openModal(html){ $('#modal-wrap').innerHTML = html; $('#modal-wrap').classList.add('show'); }
+function closeModal(){ $('#modal-wrap').classList.remove('show'); $('#modal-wrap').innerHTML = ''; }
+function head(t, d, extra){
+  return '<div class="page-head"><div><h2>' + t + '</h2><p>' + d + '</p></div><div class="ph-r">' + (extra || '') + '</div></div>';
+}
+function stat(l, v){ return '<div class="stat"><div class="l">' + l + '</div><div class="v num">' + v + '</div></div>'; }
+
+/* 纯 SVG 柱状图 */
+function barChart(data){
+  const W = 620, H = 230, base = H - 34;
+  const max = Math.max.apply(null, data.map(d => d.v)) * 1.15;
+  const gap = (W - 56) / data.length;
+  const bw = Math.min(36, gap * 0.45);
+  const bars = data.map((d, i) => {
+    const h = (d.v / max) * (H - 74);
+    const x = 44 + i * gap + (gap - bw) / 2, y = base - h;
+    return '<rect x="' + x + '" y="' + y + '" width="' + bw + '" height="' + h + '" rx="7" fill="url(#bgGrad)" opacity="' + (i === data.length - 1 ? 1 : 0.72) + '"/>' +
+      '<text x="' + (x + bw / 2) + '" y="' + (y - 9) + '" text-anchor="middle" font-size="12.5" font-weight="600" fill="#3d4657">' + d.v + '</text>' +
+      '<text x="' + (x + bw / 2) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="12" fill="#8a93a6">' + d.m + '</text>';
+  }).join('');
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto">' +
+    '<defs><linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a7bff"/><stop offset="1" stop-color="#2f54eb"/></linearGradient></defs>' +
+    '<line x1="38" y1="' + base + '" x2="' + (W - 12) + '" y2="' + base + '" stroke="#e6e9f2"/>' + bars + '</svg>';
+}
+/* conic-gradient 环形图 */
+function donut(segs){
+  let acc = 0;
+  const parts = segs.map(s => { const from = acc; acc += s.v; return s.c + ' ' + from + '% ' + acc + '%'; }).join(',');
+  const top = segs.slice().sort((a, b) => b.v - a.v)[0];
+  return '<div class="donut" style="background:conic-gradient(' + parts + ')"><div class="c"><b>' + top.v + '%</b><span>' + esc(top.n) + '</span></div></div>';
+}
+function kpi(ic, cls, label, value, delta, dcls){
+  return '<div class="card kpi"><div class="kpi-ic ' + cls + '">' + ic + '</div><div><div class="l">' + label + '</div><div class="v num">' + value + '</div><span class="delta ' + dcls + '">' + delta + '</span></div></div>';
+}
+
+/* ================= 1. 经营驾驶舱 ================= */
+function renderDashboard(){
+  const PL = scopedPolicies(), LD = scopedLeads();
+  const exp30 = PL.filter(p => p.status === '生效中' && (() => { const d = dleft(p.end); return d >= 0 && d <= 30; })()).length;
+  const leadN = LD.filter(l => l.st !== '已流失').length;
+  const monthN = PL.filter(p => p.start.slice(0,7) === '2026-09').length;
+  const mine = !!ROLE.scope;
+  const monthPrem = mine ? PL.filter(p => p.start.slice(0,7) === '2026-09').reduce((s,p) => s + p.premium, 0) : PROFIT.premium;
+  return head('经营驾驶舱', mine ? '实时掌握我的经营动态（仅统计本人名下数据）· 数据更新于 2026-09-22 08:30' : '实时掌握团队经营动态 · 数据更新于 2026-09-22 08:30') +
+  '<div class="grid grid-4">' +
+    kpi(I.coins, 'ic-blue',   mine ? '我的本月保费（元）' : '本月保费（元）',   money(monthPrem), '▲ 较上月 +12.4%', 'good') +
+    kpi(I.file,  'ic-green',  mine ? '我的新保单（件）' : '本月新保单（件）',   monthN + ' 件', '▲ 较上月 +1 件', 'good') +
+    kpi(I.clock, 'ic-orange', mine ? '我的30天内到期保单' : '30天内到期保单',   exp30 + ' 件', '▼ 较上月 -28.6%', 'good') +
+    kpi(I.target,'ic-purple', mine ? '我的跟进中线索' : '未成交跟进中线索',   leadN + ' 条', '▲ 较上月 +16.7%', 'bad') +
+  '</div>' +
+  '<div class="grid grid-2" style="margin-top:16px">' +
+    '<div class="card"><div class="card-h"><h3>近 6 个月保费趋势</h3><span class="hint">单位：万元</span></div><div class="card-b">' + barChart(TREND) + '</div></div>' +
+    '<div class="card"><div class="card-h"><h3>保司业务占比</h3><span class="hint">按本年累计保费</span></div><div class="card-b"><div class="donut-wrap">' +
+      donut(DONUT) +
+      '<div class="legend">' + DONUT.map(d => '<div class="li"><i style="background:' + d.c + '"></i>' + d.n + '<b class="pct num">' + d.v + '%</b></div>').join('') + '</div>' +
+    '</div></div></div>' +
+  '</div>' +
+  '<div class="grid grid-2b" style="margin-top:16px">' +
+    '<div class="card"><div class="card-h"><h3>今日待办</h3><span class="hint">点击圆圈标记完成</span></div><div class="card-b" id="todo-list">' +
+      TODOS.map((t, i) => '<div class="todo" data-i="' + i + '"><span class="todo-c"></span><div class="tx"><span class="tag-s ' + t.tc + '">' + t.tag + '</span>' + t.x + '</div></div>').join('') +
+    '</div></div>' +
+    '<div class="card ai-card"><div class="card-h"><h3>AI 经营日报</h3><span class="ai-badge">AI 生成</span></div><div class="card-b">' +
+      '<p class="ai-p">' + AI_REPORT + '</p>' +
+      '<div style="margin-top:14px"><button class="btn btn-p btn-sm" id="ai-regen">重新生成</button></div>' +
+    '</div></div>' +
+  '</div>';
+}
+function bindDashboard(){
+  $('#todo-list').addEventListener('click', e => {
+    const t = e.target.closest('.todo');
+    if(!t) return;
+    t.classList.toggle('done');
+    toast(t.classList.contains('done') ? '待办已标记完成（演示）' : '已恢复该待办', t.classList.contains('done') ? 'success' : 'info');
+  });
+  $('#ai-regen').onclick = () => toast('AI 日报已根据最新经营数据重新生成（演示）');
+}
+
+/* ================= 2. 客户管理 ================= */
+let crmQ = '', crmTag = '全部';
+const TAGS = ['全部', '高净值', '车险到期', '家庭客户', '新客'];
+function crmRows(){
+  const q = crmQ.replace(/\s/g, '');
+  const list = scopedCustomers().filter(c =>
+    (crmTag === '全部' || c.tags.includes(crmTag)) &&
+    (!q || c.name.includes(q) || c.phone.replace(/\s/g, '').includes(q)));
+  if(!list.length) return '<tr><td colspan="7" class="empty">暂无匹配客户，请调整搜索或筛选条件</td></tr>';
+  return list.map(c => {
+    const pl = POLICIES.filter(p => p.cid === c.id);
+    const total = pl.reduce((s, p) => s + p.premium, 0);
+    return '<tr class="clickable" data-cid="' + c.id + '">' +
+      '<td><b>' + esc(c.name) + '</b></td>' +
+      '<td class="num">' + esc(c.phone) + '</td>' +
+      '<td>' + c.tags.map(t => '<span class="tag-p ' + TAGC[t] + '">' + esc(t) + '</span>').join('') + '</td>' +
+      '<td class="num">' + pl.length + '</td>' +
+      '<td class="num"><b>' + money(total) + '</b></td>' +
+      '<td class="num">' + esc(c.lastFollow) + '</td>' +
+      '<td>' + esc(c.owner) + '</td></tr>';
+  }).join('');
+}
+function renderCRM(){
+  return head('客户管理', '共 ' + scopedCustomers().length + ' 位客户' + (ROLE.scope ? '（仅本人名下）' : '') + ' · 点击行查看 360° 客户视图', ROLE.write ? '<button class="btn btn-p" id="crm-add">＋ 新增客户</button>' : '') +
+  roBanner() +
+  '<div class="card"><div class="card-b" style="padding-top:16px">' +
+    '<div class="filter-bar">' +
+      '<input class="inp" id="crm-q" style="width:250px" placeholder="搜索姓名 / 电话" value="' + esc(crmQ) + '">' +
+      '<div class="chips" id="crm-tags">' + TAGS.map(t => '<span class="chip' + (t === crmTag ? ' on' : '') + '" data-t="' + t + '">' + t + '</span>').join('') + '</div>' +
+    '</div>' +
+    '<div class="table-wrap"><table class="tbl-hover"><thead><tr><th>姓名</th><th>电话</th><th>标签</th><th>保单数</th><th>累计保费</th><th>最近跟进</th><th>负责人</th></tr></thead><tbody id="crm-tb">' + crmRows() + '</tbody></table></div>' +
+  '</div></div>';
+}
+function bindCRM(){
+  $('#crm-q').addEventListener('input', e => { crmQ = e.target.value; $('#crm-tb').innerHTML = crmRows(); });
+  $('#crm-tags').addEventListener('click', e => {
+    const c = e.target.closest('.chip');
+    if(!c) return;
+    crmTag = c.dataset.t;
+    $$('#crm-tags .chip').forEach(x => x.classList.toggle('on', x === c));
+    $('#crm-tb').innerHTML = crmRows();
+  });
+  $('#crm-tb').addEventListener('click', e => {
+    const tr = e.target.closest('tr[data-cid]');
+    if(tr) openCustomer(+tr.dataset.cid);
+  });
+  const add = $('#crm-add');
+  if(add) add.onclick = openCustomerModal;
+}
+function openCustomer(id){
+  const c = cust(id);
+  const pl = POLICIES.filter(p => p.cid === id);
+  const total = pl.reduce((s, p) => s + p.premium, 0);
+  const fl = FOLLOWUPS[id] || [];
+  openDrawer(
+    '<div class="d-name">' + esc(c.name) + '<span class="d-meta">' + esc(c.gender) + ' · ' + esc(c.age) + ' 岁 · ' + esc(c.city) + '</span></div><div style="margin-top:8px">' + c.tags.map(t => '<span class="tag-p ' + TAGC[t] + '">' + esc(t) + '</span>').join('') + '</div>',
+    '<div class="sec-t">基本信息</div>' +
+    '<div class="info-grid">' +
+      '<div class="it"><div class="k">联系电话</div>' + esc(c.phone) + '</div>' +
+      '<div class="it"><div class="k">负责人</div>' + esc(c.owner) + '</div>' +
+      '<div class="it"><div class="k">保单数量</div>' + pl.length + ' 件</div>' +
+      '<div class="it"><div class="k">累计保费</div><b>' + money(total) + '</b></div>' +
+      '<div class="it" style="grid-column:1/3"><div class="k">备注</div>' + esc(c.remark) + '</div>' +
+    '</div>' +
+    '<div class="sec-t">名下保单（' + pl.length + '）</div>' +
+    '<table class="mini"><thead><tr><th>保单号</th><th>险种</th><th>保费</th><th>状态</th></tr></thead><tbody>' +
+      (pl.map(p => '<tr><td class="num">' + p.no + '</td><td>' + p.type + '</td><td class="num">' + money(p.premium) + '</td><td>' + badge(p.status, PST[p.status]) + '</td></tr>').join('') || '<tr><td colspan="4">暂无保单</td></tr>') +
+    '</tbody></table>' +
+    '<div class="sec-t">跟进记录</div>' +
+    '<div class="tl">' + (fl.map(f => '<div class="tl-item"><div class="tl-date">' + esc(f.d) + ' · ' + esc(f.t) + ' · ' + esc(f.o) + '</div><div class="tl-x">' + esc(f.x) + '</div></div>').join('') || '<div class="hint">暂无跟进记录</div>') + '</div>' +
+    '<div class="ai-advice"><span class="ai-badge">AI 建议</span><p>' + (AI_ADVICE[id] || '建议 3 天内安排一次电话回访，同步最新产品动态。') + '</p></div>'
+  );
+}
+
+/* ================= 3. 承保清单 ================= */
+let polIns = '全部', polSt = '全部', polQ = '';
+function polStats(){
+  const list = scopedPolicies();
+  const act = list.filter(p => p.status === '生效中').length;
+  const month = list.filter(p => p.start.slice(0, 7) === '2026-09').length;
+  const sum = list.reduce((s, p) => s + p.premium, 0);
+  return '<div class="stat-strip">' +
+    stat('保单总量', list.length + ' 件') +
+    stat('生效中', act + ' 件') +
+    stat('本月新承保', month + ' 件') +
+    stat('在管保费合计', money(sum)) +
+  '</div>';
+}
+function polRows(){
+  const list = scopedPolicies().filter(p =>
+    (polIns === '全部' || p.ins === polIns) &&
+    (polSt === '全部' || p.status === polSt) &&
+    (!polQ || p.no.toLowerCase().includes(polQ.toLowerCase()) || cust(p.cid).name.includes(polQ)));
+  if(!list.length) return '<tr><td colspan="9" class="empty">暂无匹配保单，请调整筛选条件</td></tr>';
+  return list.map(p => '<tr class="clickable" data-no="' + esc(p.no) + '">' +
+    '<td class="num" style="font-weight:600">' + esc(p.no) + '</td>' +
+    '<td>' + esc(cust(p.cid).name) + '</td>' +
+    '<td>' + insBadge(p.ins) + '</td>' +
+    '<td>' + esc(p.type) + '</td>' +
+    '<td class="num"><b>' + money(p.premium) + '</b></td>' +
+    '<td class="num">' + (p.rate * 100).toFixed(1) + '%</td>' +
+    '<td class="num">' + p.start + '</td>' +
+    '<td class="num">' + p.end + '</td>' +
+    '<td>' + badge(p.status, PST[p.status]) + '</td></tr>').join('');
+}
+function renderPolicies(){
+  return head('承保清单', (ROLE.scope ? '本人名下在管保单与续保状态一览' : '在管保单与续保状态一览') + ' · 点击行查看保单详情', ROLE.write ? '<button class="btn btn-p" id="pol-add">＋ 登记新保单</button>' : '') +
+  roBanner() +
+  polStats() +
+  '<div class="card"><div class="card-b" style="padding-top:16px">' +
+    '<div class="filter-bar">' +
+      '<select class="sel" id="pol-ins"><option' + (polIns === '全部' ? ' selected' : '') + '>全部</option>' + INSURERS.map(i => '<option' + (i === polIns ? ' selected' : '') + '>' + i + '</option>').join('') + '</select>' +
+      '<select class="sel" id="pol-st"><option' + (polSt === '全部' ? ' selected' : '') + '>全部</option>' + Object.keys(PST).map(s => '<option' + (s === polSt ? ' selected' : '') + '>' + s + '</option>').join('') + '</select>' +
+      '<input class="inp" id="pol-q" style="width:220px" placeholder="搜索保单号 / 客户姓名" value="' + esc(polQ) + '">' +
+    '</div>' +
+    '<div class="table-wrap"><table class="tbl-hover"><thead><tr><th>保单号</th><th>客户</th><th>保险公司</th><th>险种</th><th>保费</th><th>佣金率</th><th>承保日期</th><th>到期日期</th><th>状态</th></tr></thead><tbody id="pol-tb">' + polRows() + '</tbody></table></div>' +
+  '</div></div>';
+}
+function bindPolicies(){
+  $('#pol-ins').onchange = e => { polIns = e.target.value; $('#pol-tb').innerHTML = polRows(); };
+  $('#pol-st').onchange  = e => { polSt  = e.target.value; $('#pol-tb').innerHTML = polRows(); };
+  $('#pol-q').oninput    = e => { polQ   = e.target.value; $('#pol-tb').innerHTML = polRows(); };
+  $('#pol-tb').addEventListener('click', e => {
+    const tr = e.target.closest('tr[data-no]');
+    if(tr) openPolicy(tr.dataset.no);
+  });
+  const add = $('#pol-add');
+  if(add) add.onclick = openPolicyModal;
+}
+function openPolicy(no){
+  const p = POLICIES.find(x => x.no === no);
+  const c = cust(p.cid);
+  const cl = CLAIMS.filter(x => x.pol === no);
+  openDrawer(
+    '保单 <span class="num">' + esc(p.no) + '</span><div style="margin-top:8px">' + badge(p.status, PST[p.status]) + ' ' + insBadge(p.ins) + '</div>',
+    '<div class="sec-t">保单信息</div>' +
+    '<div class="info-grid">' +
+      '<div class="it"><div class="k">投保人</div>' + esc(c.name) + '（' + esc(c.phone) + '）</div>' +
+      '<div class="it"><div class="k">险种</div>' + esc(p.type) + '</div>' +
+      '<div class="it"><div class="k">保费</div><b>' + money(p.premium) + '</b></div>' +
+      '<div class="it"><div class="k">佣金率</div>' + (p.rate * 100).toFixed(1) + '%</div>' +
+      '<div class="it"><div class="k">承保日期</div>' + p.start + '</div>' +
+      '<div class="it"><div class="k">到期日期</div>' + p.end + '</div>' +
+      '<div class="it"><div class="k">预期佣金</div>' + money(Math.round(p.premium * p.rate)) + '</div>' +
+      '<div class="it"><div class="k">距到期</div>' + (p.status === '生效中' ? dleft(p.end) + ' 天' : '—') + '</div>' +
+    '</div>' +
+    '<div class="sec-t">关联理赔</div>' +
+    (cl.length
+      ? '<table class="mini"><thead><tr><th>报案号</th><th>出险日期</th><th>赔付金额</th><th>状态</th></tr></thead><tbody>' + cl.map(x => '<tr><td class="num">' + esc(x.no) + '</td><td class="num">' + esc(x.date) + '</td><td class="num">' + money(x.amt) + '</td><td>' + badge(x.st, CST[x.st]) + '</td></tr>').join('') + '</tbody></table>'
+      : '<div class="hint">无关联理赔记录</div>'),
+    'policy'
+  );
+}
+function openPolicyModal(){
+  const types = ['机动车商业险','重大疾病保险','百万医疗保险','年金保险','终身寿险','定期寿险','家庭财产保险','意外伤害保险'];
+  openModal(
+    '<div class="modal card">' +
+      '<div class="modal-h"><h3>登记新保单</h3><button class="x-btn" onclick="closeModal()">✕</button></div>' +
+      '<div class="modal-b"><div class="form-grid">' +
+        '<div class="field"><label>客户姓名 *</label><input id="np-name" placeholder="投保人姓名"></div>' +
+        '<div class="field"><label>保险公司 *</label><select id="np-ins">' + INSURERS.map(i => '<option>' + i + '</option>').join('') + '</select></div>' +
+        '<div class="field"><label>险种 *</label><select id="np-type">' + types.map(t => '<option>' + t + '</option>').join('') + '</select></div>' +
+        '<div class="field"><label>保费（元）*</label><input id="np-premium" type="number" min="0" placeholder="如 5200"></div>' +
+        '<div class="field"><label>佣金率（%）*</label><input id="np-rate" type="number" min="0" step="0.1" placeholder="如 12"></div>' +
+        '<div class="field"><label>到期日期 *</label><input id="np-end" type="date" value="2027-09-22"></div>' +
+      '</div></div>' +
+      '<div class="modal-f"><button class="btn btn-g" onclick="closeModal()">取消</button><button class="btn btn-p" id="np-submit">提交登记</button></div>' +
+    '</div>'
+  );
+  $('#np-submit').onclick = () => {
+    const name = $('#np-name').value.trim();
+    const premium = parseFloat($('#np-premium').value);
+    const rate = parseFloat($('#np-rate').value);
+    const end = $('#np-end').value;
+    if(!name || !premium || premium <= 0 || !rate || rate <= 0 || !end){ toast('请完整填写保单信息（保费、佣金率需大于 0）', 'warn'); return; }
+    let c = CUSTOMERS.find(x => x.name === name);
+    if(!c){
+      c = {id: Math.max.apply(null, CUSTOMERS.map(x => x.id)) + 1, name: name, phone: '待补充', gender: '—', age: '—', city: '待补充', tags: ['新客'], lastFollow: TODAY, owner: '王雅静', remark: '承保清单登记时自动创建'};
+      CUSTOMERS.push(c);
+      FOLLOWUPS[c.id] = [{d: TODAY, t: '系统', x: '新保单登记时自动创建客户档案', o: '系统'}];
+    }
+    const no = 'BX2026' + Math.floor(100000 + Math.random() * 899999);
+    POLICIES.unshift({no: no, cid: c.id, ins: $('#np-ins').value, type: $('#np-type').value, premium: premium, rate: rate / 100, start: TODAY, end: end, status: '生效中'});
+    closeModal();
+    toast('保单 ' + no + ' 登记成功，已同步客户「' + esc(name) + '」档案（演示）');
+    nav('policies');
+  };
+}
+
+/* ---- 新增客户/线索/理赔 表单 ---- */
+function openCustomerModal(){
+  openModal('<div class="modal card">' +
+    '<div class="modal-h"><h3>新增客户</h3><button class="x-btn" onclick="closeModal()">✕</button></div>' +
+    '<div class="modal-b"><div class="form-grid">' +
+      '<div class="field"><label>姓名 *</label><input id="nc-name" placeholder="客户姓名"></div>' +
+      '<div class="field"><label>联系电话</label><input id="nc-phone" placeholder="如 138 0000 0000"></div>' +
+      '<div class="field"><label>客户标签</label><select id="nc-tag">' + ['高净值','车险到期','家庭客户','新客'].map(t => '<option>' + t + '</option>').join('') + '</select></div>' +
+      '<div class="field"><label>负责人</label><select id="nc-owner">' + EMPLOYEES.map(e => '<option>' + esc(e.name) + '</option>').join('') + '</select></div>' +
+    '</div></div>' +
+    '<div class="modal-f"><button class="btn btn-g" onclick="closeModal()">取消</button><button class="btn btn-p" id="nc-submit">提交</button></div></div>');
+  $('#nc-submit').onclick = () => {
+    const name = $('#nc-name').value.trim();
+    if(!name){ toast('请填写客户姓名', 'warn'); return; }
+    if(CUSTOMERS.some(c => c.name === name)){ toast('客户「' + esc(name) + '」已存在，请勿重复创建', 'warn'); return; }
+    const id = Math.max.apply(null, CUSTOMERS.map(x => x.id)) + 1;
+    CUSTOMERS.unshift({id: id, name: name, phone: $('#nc-phone').value.trim() || '待补充', gender: '—', age: '—', city: '待补充', tags: [$('#nc-tag').value], lastFollow: TODAY, owner: $('#nc-owner').value, remark: '手动新增客户，档案待完善'});
+    FOLLOWUPS[id] = [{d: TODAY, t: '系统', x: '手动新增客户，待补充完整档案', o: '系统'}];
+    closeModal();
+    toast('客户「' + esc(name) + '」创建成功（演示）');
+    nav('crm');
+  };
+}
+function openLeadModal(){
+  const types = ['重大疾病保险','年金保险','养老年金保险','终身寿险','机动车商业险','百万医疗保险','家庭财产保险','意外伤害保险'];
+  openModal('<div class="modal card">' +
+    '<div class="modal-h"><h3>新增线索</h3><button class="x-btn" onclick="closeModal()">✕</button></div>' +
+    '<div class="modal-b"><div class="form-grid">' +
+      '<div class="field"><label>客户姓名 *</label><input id="nl-name" placeholder="线索客户姓名"></div>' +
+      '<div class="field"><label>意向险种</label><select id="nl-intent">' + types.map(t => '<option>' + t + '</option>').join('') + '</select></div>' +
+      '<div class="field"><label>来源渠道</label><select id="nl-src">' + CHANNELS.map(c => '<option>' + esc(c.name) + '</option>').join('') + '</select></div>' +
+      '<div class="field"><label>AI 意向评分（0-100）</label><input id="nl-score" type="number" min="0" max="100" value="60"></div>' +
+    '</div></div>' +
+    '<div class="modal-f"><button class="btn btn-g" onclick="closeModal()">取消</button><button class="btn btn-p" id="nl-submit">提交</button></div></div>');
+  $('#nl-submit').onclick = () => {
+    const name = $('#nl-name').value.trim();
+    if(!name){ toast('请填写客户姓名', 'warn'); return; }
+    const score = Math.max(0, Math.min(100, Math.round(parseFloat($('#nl-score').value) || 0)));
+    LEADS.unshift({name: name, intent: $('#nl-intent').value, src: $('#nl-src').value, last: TODAY, times: 0, score: score, st: '待跟进', owner: '王雅静'});
+    closeModal();
+    toast('线索「' + esc(name) + '」已创建，进入待跟进列表（演示）');
+    nav('leads');
+  };
+}
+function openClaimModal(){
+  openModal('<div class="modal card">' +
+    '<div class="modal-h"><h3>登记理赔</h3><button class="x-btn" onclick="closeModal()">✕</button></div>' +
+    '<div class="modal-b"><div class="form-grid">' +
+      '<div class="field"><label>客户 *</label><select id="cl-cid">' + CUSTOMERS.map(c => '<option value="' + c.id + '">' + esc(c.name) + '</option>').join('') + '</select></div>' +
+      '<div class="field"><label>关联保单 *</label><select id="cl-pol">' + POLICIES.map(p => '<option value="' + esc(p.no) + '">' + esc(p.no) + '（' + esc(cust(p.cid).name) + ' ' + esc(p.type) + '）</option>').join('') + '</select></div>' +
+      '<div class="field"><label>出险日期 *</label><input id="cl-date" type="date" value="' + TODAY + '"></div>' +
+      '<div class="field"><label>赔付金额（元）*</label><input id="cl-amt" type="number" min="0" placeholder="如 8000"></div>' +
+    '</div></div>' +
+    '<div class="modal-f"><button class="btn btn-g" onclick="closeModal()">取消</button><button class="btn btn-p" id="cl-submit">提交登记</button></div></div>');
+  $('#cl-submit').onclick = () => {
+    const cid = parseInt($('#cl-cid').value, 10);
+    const pol = POLICIES.find(x => x.no === $('#cl-pol').value);
+    const date = $('#cl-date').value;
+    const amt = parseFloat($('#cl-amt').value);
+    if(!pol || !date || !amt || amt <= 0){ toast('请完整填写理赔信息（金额需大于 0）', 'warn'); return; }
+    CLAIMS.unshift({no: 'CL2026' + Math.floor(100000 + Math.random() * 899999), cid: cid, pol: pol.no, ins: pol.ins, date: date, amt: amt, st: '已报案'});
+    closeModal();
+    toast('理赔报案已登记，状态：已报案（演示）');
+    nav('claims');
+  };
+}
+
+/* ================= 4. 续保提醒 ================= */
+function rnList(){
+  const ids = new Set(scopedCustomers().map(c => c.id));
+  return POLICIES.map(p => Object.assign({}, p, {dl: dleft(p.end)}))
+    .filter(p => ids.has(p.cid) && p.status === '生效中' && p.dl >= 0 && p.dl <= 60)
+    .sort((a, b) => a.dl - b.dl);
+}
+function rnGroup(title, cls, dot, list){
+  if(!list.length) return '';
+  return '<div class="rn-group"><div class="rn-title"><span class="rn-dot" style="background:' + dot + '"></span>' + title + '<span class="hint">（' + list.length + ' 件）</span></div>' +
+    list.map(r => {
+      const c = cust(r.cid);
+      const sent = SENT.has(r.no);
+      return '<div class="rn-item rn-' + cls + '">' +
+        '<div class="rn-main"><b>' + esc(c.name) + '</b><span class="rn-no num">' + esc(r.no) + '</span><div class="rn-sub">' + insBadge(r.ins) + ' · ' + esc(r.type) + '</div></div>' +
+        '<div class="rn-date"><div class="num">' + r.end + '</div><div>到期日</div></div>' +
+        '<div>' + badge(r.dl <= 0 ? '今日到期' : '剩余 ' + r.dl + ' 天', r.dl <= 7 ? 'b-red' : r.dl <= 30 ? 'b-orange' : 'b-gray') + '</div>' +
+        '<div class="rn-cond"><b>上年保费 ' + money(r.prev || r.premium) + '</b><span>' + esc(r.coverage || '保障责任以条款为准') + '</span><span class="rn-note">' + esc(r.note || '') + '</span></div>' +
+        (ROLE.write
+          ? '<button class="btn btn-sm rn-btn ' + (sent ? 'btn-g' : 'btn-p') + '" data-no="' + r.no + '"' + (sent ? ' disabled' : '') + '>' + (sent ? '✓ 已发送' : '发送提醒') + '</button>'
+          : '<span class="hint" style="width:72px;text-align:center;flex:none">无操作权限</span>') +
+      '</div>';
+    }).join('') + '</div>';
+}
+function renderRenewals(){
+  const l = rnList();
+  return head('续保提醒', (ROLE.scope ? '本人名下保单按剩余到期时间自动分组' : '按剩余到期时间自动分组') + ' · 红色为 7 天内紧急件') +
+  roBanner() +
+  '<div class="ai-banner card"><span class="ai-badge">AI</span><div>AI 已自动生成 <b>' + l.length + '</b> 条个性化续保话术，已按客户画像、上年承保条件与出险记录匹配最佳触达时间与话术策略</div>' + (ROLE.write ? '<button class="btn btn-g btn-sm" id="rn-copy">复制全部话术</button>' : '') + '</div>' +
+  rnGroup('7 天内到期',   'red',    '#e03131', l.filter(r => r.dl <= 7)) +
+  rnGroup('8 ~ 30 天到期', 'orange', '#e8590c', l.filter(r => r.dl > 7 && r.dl <= 30)) +
+  rnGroup('31 ~ 60 天到期','gray',   '#adb5bd', l.filter(r => r.dl > 30));
+}
+function bindRenewals(){
+  $$('.rn-btn').forEach(b => b.onclick = () => {
+    if(SENT.has(b.dataset.no)) return;
+    SENT.add(b.dataset.no);
+    const p = POLICIES.find(x => x.no === b.dataset.no);
+    b.textContent = '✓ 已发送';
+    b.classList.remove('btn-p');
+    b.classList.add('btn-g');
+    b.disabled = true;
+    toast('已向 ' + cust(p.cid).name + ' 发送续保提醒与个性化话术（演示）');
+  });
+  const cp = $('#rn-copy');
+  if(cp) cp.onclick = () => {
+    const l = rnList();
+    const text = l.map(r => '【' + (r.dl <= 0 ? '今日到期' : '剩余 ' + r.dl + ' 天') + '】' + cust(r.cid).name + ' ' + r.ins + ' ' + r.type + '（' + r.no + '）到期日 ' + r.end + '，上年保费 ' + fmt(r.prev || r.premium) + ' 元。' + (r.note || '')).join('\n');
+    if(typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(
+        () => toast('已复制 ' + l.length + ' 条续保话术到剪贴板'),
+        () => toast('复制失败，请手动复制', 'warn'));
+    } else {
+      toast('当前环境不支持剪贴板接口，请手动复制', 'warn');
+    }
+  };
+}
+
+/* ================= 5. 未成交跟进 ================= */
+let leadSt = '全部';
+const LCHIPS = ['全部', '待跟进', '跟进中', '高意向', '已流失'];
+function leadRows(){
+  const list = scopedLeads().filter(l => leadSt === '全部' || l.st === leadSt);
+  if(!list.length) return '<tr><td colspan="8" class="empty">暂无匹配线索</td></tr>';
+  return list.map(l => '<tr>' +
+    '<td><b>' + esc(l.name) + '</b></td>' +
+    '<td>' + esc(l.intent) + '</td>' +
+    '<td>' + esc(l.src) + '</td>' +
+    '<td class="num">' + l.last + '</td>' +
+    '<td class="num">' + l.times + ' 次</td>' +
+    '<td><div class="score"><div class="score-track"><div class="score-fill' + (l.score >= 80 ? ' hot' : l.score < 50 ? ' cold' : '') + '" style="width:' + l.score + '%"></div></div><b class="num">' + l.score + '</b></div></td>' +
+    '<td>' + badge(l.st, LST[l.st]) + '</td>' +
+    '<td>' + esc(l.owner) + '</td></tr>').join('');
+}
+function renderLeads(){
+  const SL = scopedLeads();
+  return head('未成交跟进', 'AI 基于跟进频次、险种热度与对话语义评估成交意向' + (ROLE.scope ? '（仅本人名下线索）' : ''), ROLE.write ? '<button class="btn btn-p" id="lead-add">＋ 新增线索</button>' : '') +
+  roBanner() +
+  '<div class="card"><div class="card-b" style="padding-top:16px">' +
+    '<div class="chips" style="margin-bottom:14px">' + LCHIPS.map(s => '<span class="chip' + (s === leadSt ? ' on' : '') + '" data-s="' + s + '">' + s + '（' + (s === '全部' ? SL.length : SL.filter(l => l.st === s).length) + '）</span>').join('') + '</div>' +
+    '<div class="table-wrap"><table class="tbl-hover"><thead><tr><th>客户</th><th>意向险种</th><th>来源渠道</th><th>最近跟进</th><th>跟进次数</th><th>AI 意向评分</th><th>状态</th><th>负责人</th></tr></thead><tbody id="lead-tb">' + leadRows() + '</tbody></table></div>' +
+  '</div></div>';
+}
+function bindLeads(){
+  $$('.chips .chip').forEach(c => c.onclick = () => {
+    leadSt = c.dataset.s;
+    $$('.chips .chip').forEach(x => x.classList.toggle('on', x === c));
+    $('#lead-tb').innerHTML = leadRows();
+  });
+  const add = $('#lead-add');
+  if(add) add.onclick = openLeadModal;
+}
+
+/* ================= 6. 理赔记录 ================= */
+let claimSt = '全部';
+const CCHIPS = ['全部', '已报案', '审核中', '已结案'];
+function claimRows(){
+  const list = scopedClaims().filter(x => claimSt === '全部' || x.st === claimSt);
+  if(!list.length) return '<tr><td colspan="7" class="empty">暂无匹配理赔记录</td></tr>';
+  return list.map(x => '<tr>' +
+    '<td class="num" style="font-weight:600">' + esc(x.no) + '</td>' +
+    '<td>' + esc(cust(x.cid).name) + '</td>' +
+    '<td class="num">' + x.pol + '</td>' +
+    '<td>' + insBadge(x.ins) + '</td>' +
+    '<td class="num">' + x.date + '</td>' +
+    '<td class="num"><b>' + money(x.amt) + '</b></td>' +
+    '<td>' + badge(x.st, CST[x.st]) + '</td></tr>').join('');
+}
+function renderClaims(){
+  return head('理赔记录', (ROLE.scope ? '协助本人客户报案与进度跟踪' : '协助客户报案与进度跟踪') + ' · 点击筛选查看不同状态', ROLE.write ? '<button class="btn btn-p" id="claim-add">＋ 登记理赔</button>' : '') +
+  roBanner() +
+  '<div class="card"><div class="card-b" style="padding-top:16px">' +
+    '<div class="chips" style="margin-bottom:14px">' + CCHIPS.map(s => '<span class="chip' + (s === claimSt ? ' on' : '') + '" data-s="' + s + '">' + s + '</span>').join('') + '</div>' +
+    '<div class="table-wrap"><table class="tbl-hover"><thead><tr><th>报案号</th><th>客户</th><th>关联保单</th><th>保险公司</th><th>出险日期</th><th>赔付金额</th><th>状态</th></tr></thead><tbody id="claim-tb">' + claimRows() + '</tbody></table></div>' +
+  '</div></div>';
+}
+function bindClaims(){
+  $$('.chips .chip').forEach(c => c.onclick = () => {
+    claimSt = c.dataset.s;
+    $$('.chips .chip').forEach(x => x.classList.toggle('on', x === c));
+    $('#claim-tb').innerHTML = claimRows();
+  });
+  const add = $('#claim-add');
+  if(add) add.onclick = openClaimModal;
+}
+
+/* ================= 7. 渠道管理 ================= */
+function renderChannels(){
+  const conv = c => c.deals / c.leads * 100;
+  const max = Math.max.apply(null, CHANNELS.map(conv));
+  return head('渠道管理', '各渠道线索与转化表现 · 统计周期 2026-09', ROLE.write ? '<button class="btn btn-p" id="ch-add">＋ 新增渠道</button>' : '') +
+  roBanner() +
+  '<div class="card"><div class="card-b" style="padding-top:16px">' +
+    '<div class="table-wrap"><table class="tbl-hover"><thead><tr><th>渠道名称</th><th>线索数</th><th>成交数</th><th>转化率</th><th>贡献保费</th></tr></thead><tbody>' +
+    CHANNELS.map(c => '<tr><td><b>' + esc(c.name) + '</b></td><td class="num">' + c.leads + '</td><td class="num">' + c.deals + '</td><td class="num"><b>' + conv(c).toFixed(1) + '%</b></td><td class="num">' + money(c.premium) + '</td></tr>').join('') +
+    '</tbody></table></div>' +
+  '</div></div>' +
+  '<div class="card" style="margin-top:16px"><div class="card-h"><h3>渠道转化率对比</h3><span class="hint">成交数 / 线索数</span></div><div class="card-b">' +
+    CHANNELS.map(c => { const v = conv(c); return '<div class="cv-row"><span>' + c.name + '</span><div class="cv-track"><div class="cv-fill" style="width:' + (v / max * 100).toFixed(1) + '%"></div></div><b class="cv-val num">' + v.toFixed(1) + '%</b></div>'; }).join('') +
+  '</div></div>';
+}
+function openChannelModal(){
+  openModal('<div class="modal card">' +
+    '<div class="modal-h"><h3>新增渠道</h3><button class="x-btn" onclick="closeModal()">✕</button></div>' +
+    '<div class="modal-b"><div class="form-grid">' +
+      '<div class="field"><label>渠道名称 *</label><input id="nch-name" placeholder="如 银行网点合作"></div>' +
+      '<div class="field"><label>本月线索数 *</label><input id="nch-leads" type="number" min="0" placeholder="如 20"></div>' +
+      '<div class="field"><label>本月成交数 *</label><input id="nch-deals" type="number" min="0" placeholder="如 3"></div>' +
+      '<div class="field"><label>贡献保费（元）</label><input id="nch-premium" type="number" min="0" placeholder="可选"></div>' +
+    '</div></div>' +
+    '<div class="modal-f"><button class="btn btn-g" onclick="closeModal()">取消</button><button class="btn btn-p" id="nch-submit">提交</button></div></div>');
+  $('#nch-submit').onclick = () => {
+    const name = $('#nch-name').value.trim();
+    const leads = parseInt($('#nch-leads').value, 10);
+    const deals = parseInt($('#nch-deals').value, 10);
+    const premium = parseFloat($('#nch-premium').value) || 0;
+    if(!name || isNaN(leads) || leads <= 0 || isNaN(deals) || deals < 0){ toast('请完整填写渠道信息（线索数需大于 0）', 'warn'); return; }
+    if(deals > leads){ toast('成交数不能大于线索数', 'warn'); return; }
+    CHANNELS.unshift({name: name, leads: leads, deals: deals, premium: premium});
+    closeModal();
+    toast('渠道「' + esc(name) + '」创建成功（演示）');
+    nav('channels');
+  };
+}
+function bindChannels(){ const add = $('#ch-add'); if(add) add.onclick = openChannelModal; }
+
+/* ================= 8. 分成与利润 ================= */
+function renderProfit(){
+  /* 业务员视角：仅本人分成（公司利润对业务员不可见） */
+  if(ROLE.profit === 'self'){
+    const e = EMPLOYEES.find(x => x.name === ROLE.scope) || EMPLOYEES[0];
+    const pay = Math.round((e.fc + e.rc) * e.k);
+    return head('我的分成', '业务员仅可查看本人分成明细，公司利润对业务员不可见') +
+    '<div class="card"><div class="card-h"><h3>我的分成明细（2026-09）</h3><span class="hint">实发 =（首佣 + 续佣）× 考核系数</span></div><div class="card-b">' +
+      '<div class="table-wrap"><table class="tbl-hover"><thead><tr><th>业务员</th><th>角色</th><th>本月保费</th><th>首年佣金</th><th>续期佣金</th><th>考核系数</th><th>实发分成合计</th></tr></thead><tbody>' +
+        '<tr><td><b>' + esc(e.name) + '</b></td><td>' + esc(e.role) + '</td><td class="num">' + money(e.month) + '</td><td class="num">' + money(e.fc) + '</td><td class="num">' + money(e.rc) + '</td><td class="num">× ' + e.k.toFixed(2) + '</td><td class="num pay">' + money(pay) + '</td></tr>' +
+      '</tbody></table></div>' +
+    '</div></div>' +
+    '<div class="grid grid-2b" style="margin-top:16px">' +
+      '<div class="card pcard"><div class="l">我的本月保费</div><div class="v num">' + money(e.month) + '</div></div>' +
+      '<div class="card pcard ok"><div class="l">我的实发分成（2026-09）</div><div class="v num">' + money(pay) + '</div></div>' +
+    '</div>' +
+    '<div class="ai-banner card" style="margin-top:16px"><span class="ai-badge">提示</span><div>公司利润、其他业务员分成等经营数据仅「系统管理员 / 财务专员」可见，当前角色为「' + ROLE.urole + '」</div></div>';
+  }
+  const payout = EMPLOYEES.reduce((s, e) => s + Math.round((e.fc + e.rc) * e.k), 0);
+  const net = PROFIT.settle - payout - PROFIT.cost;
+  const pfBars = [
+    ['保司结算佣金', PROFIT.settle, '#2f54eb'],
+    ['业务员分成',   payout,        '#fa8c16'],
+    ['运营成本',     PROFIT.cost,   '#722ed1'],
+    ['本月净利润',   net,           '#2f9e44']
+  ];
+  return head('分成与利润', '业务员分成核算与公司月度利润测算', '<button class="btn btn-g" id="pf-exp">导出报表</button>') +
+  '<div class="card"><div class="card-h"><h3>业务员分成表（2026-09）</h3><span class="hint">实发 =（首佣 + 续佣）× 考核系数</span></div><div class="card-b">' +
+    '<div class="table-wrap"><table class="tbl-hover"><thead><tr><th>业务员</th><th>角色</th><th>本月保费</th><th>首年佣金</th><th>续期佣金</th><th>考核系数</th><th>实发分成合计</th></tr></thead><tbody>' +
+    EMPLOYEES.map(e => { const pay = Math.round((e.fc + e.rc) * e.k); return '<tr><td><b>' + esc(e.name) + '</b></td><td>' + esc(e.role) + '</td><td class="num">' + money(e.month) + '</td><td class="num">' + money(e.fc) + '</td><td class="num">' + money(e.rc) + '</td><td class="num">× ' + e.k.toFixed(2) + '</td><td class="num pay">' + money(pay) + '</td></tr>'; }).join('') +
+    '</tbody></table></div>' +
+  '</div></div>' +
+  '<div class="grid grid-p5" style="margin-top:16px">' +
+    '<div class="card pcard"><div class="l">月总保费</div><div class="v num">' + money(PROFIT.premium) + '</div></div>' +
+    '<div class="card pcard"><div class="l">保司结算佣金（18.0%）</div><div class="v num">' + money(PROFIT.settle) + '</div></div>' +
+    '<div class="card pcard"><div class="l">业务员分成合计</div><div class="v num">' + money(payout) + '</div></div>' +
+    '<div class="card pcard"><div class="l">运营成本</div><div class="v num">' + money(PROFIT.cost) + '</div></div>' +
+    '<div class="card pcard ok"><div class="l">本月净利润</div><div class="v num">' + money(net) + '</div></div>' +
+  '</div>' +
+  '<div class="card" style="margin-top:16px"><div class="card-h"><h3>公司利润构成</h3><span class="hint">单位：元</span></div><div class="card-b">' +
+    '<div class="pf-chart">' + pfBars.map(b => '<div class="pf-col"><div class="pf-bar" style="height:' + Math.max(b[1] / PROFIT.settle * 100, 5).toFixed(1) + '%;background:' + b[2] + '"><span>' + money(b[1]) + '</span></div><div class="pf-name">' + b[0] + '</div></div>').join('') + '</div>' +
+    '<div class="pf-formula">结算佣金 ' + money(PROFIT.settle) + ' － 业务员分成 ' + money(payout) + ' － 运营成本 ' + money(PROFIT.cost) + ' ＝ 净利润 <b>' + money(net) + '</b><span class="ai-badge" style="margin-left:auto">演示数据</span></div>' +
+  '</div></div>';
+}
+function bindProfit(){ $('#pf-exp').onclick = () => toast('演示环境：利润报表已导出（模拟数据）'); }
+
+/* ================= 9. 员工工作量 ================= */
+const WLM = [['新增承保','#2f54eb'],['续保处理','#53a8ff'],['跟进次数','#722ed1'],['资料归档','#13c2c2'],['理赔协助','#fa8c16']];
+function renderWorkload(){
+  const wlRo = !ROLE.write || ROLE.key === 'ops';
+  return head('员工工作量', '今日各项业务处理量统计 · 2026-09-22', wlRo ? '' : '<button class="btn btn-g" id="wl-exp">导出报表</button>') +
+  (wlRo ? roBanner() : '') +
+  '<div class="card"><div class="card-b" style="padding-top:16px">' +
+    '<div class="table-wrap"><table class="tbl-hover"><thead><tr><th>姓名</th><th>今日新增承保</th><th>续保处理</th><th>跟进次数</th><th>资料归档</th><th>理赔协助</th><th>合计</th></tr></thead><tbody>' +
+    EMPLOYEES.map(e => { const t = e.newBiz + e.renew + e.follow + e.archive + e.claim; return '<tr><td><b>' + e.name + '</b> <span class="hint">' + e.role + '</span></td><td class="num">' + e.newBiz + '</td><td class="num">' + e.renew + '</td><td class="num">' + e.follow + '</td><td class="num">' + e.archive + '</td><td class="num">' + e.claim + '</td><td class="num"><b>' + t + '</b></td></tr>'; }).join('') +
+    '</tbody></table></div>' +
+  '</div></div>' +
+  '<div class="card" style="margin-top:16px"><div class="card-h"><h3>人均工作量分布</h3><div class="legend-h">' + WLM.map(w => '<span class="li"><i style="background:' + w[1] + '"></i>' + w[0] + '</span>').join('') + '</div></div><div class="card-b">' +
+    EMPLOYEES.map(e => {
+      const t = e.newBiz + e.renew + e.follow + e.archive + e.claim;
+      const vals = [e.newBiz, e.renew, e.follow, e.archive, e.claim];
+      const segs = vals.map((v, i) => v > 0 ? '<div class="wl-seg" style="width:' + (v / t * 100).toFixed(1) + '%;background:' + WLM[i][1] + '" title="' + WLM[i][0] + '：' + v + ' 件"></div>' : '').join('');
+      return '<div class="wl-row"><b>' + e.name + '</b><div class="wl-track">' + segs + '</div><span class="num wl-t">' + t + ' 件</span></div>';
+    }).join('') +
+  '</div></div>';
+}
+function bindWorkload(){ const b = $('#wl-exp'); if(b) b.onclick = () => toast('演示环境：工作量报表已导出（模拟数据）'); }
+
+/* ================= 路由与导航 ================= */
+const MENUS = [
+  {id:'dashboard', name:'经营驾驶舱', icon:I.dash,   group:'工作台'},
+  {id:'crm',       name:'客户管理',   icon:I.users,  group:'业务管理'},
+  {id:'policies',  name:'承保清单',   icon:I.file,   group:'业务管理'},
+  {id:'renewals',  name:'续保提醒',   icon:I.clock,  group:'业务管理'},
+  {id:'leads',     name:'未成交跟进', icon:I.target, group:'业务管理'},
+  {id:'claims',    name:'理赔记录',   icon:I.shield, group:'业务管理'},
+  {id:'channels',  name:'渠道管理',   icon:I.share,  group:'经营管理'},
+  {id:'profit',    name:'分成与利润', icon:I.coins,  group:'经营管理'},
+  {id:'workload',  name:'员工工作量', icon:I.case,   group:'经营管理'}
+];
+const PAGES = {
+  dashboard:{n:'经营驾驶舱', r:renderDashboard, b:bindDashboard},
+  crm:{n:'客户管理', r:renderCRM, b:bindCRM},
+  policies:{n:'承保清单', r:renderPolicies, b:bindPolicies},
+  renewals:{n:'续保提醒', r:renderRenewals, b:bindRenewals},
+  leads:{n:'未成交跟进', r:renderLeads, b:bindLeads},
+  claims:{n:'理赔记录', r:renderClaims, b:bindClaims},
+  channels:{n:'渠道管理', r:renderChannels, b:bindChannels},
+  profit:{n:'分成与利润', r:renderProfit, b:bindProfit},
+  workload:{n:'员工工作量', r:renderWorkload, b:bindWorkload}
+};
+function nav(id){
+  if((location.hash || '#/dashboard') === '#/' + id){ route(); }
+  else location.hash = '#/' + id;
+}
+function route(){
+  const raw = (location.hash || '#/dashboard').slice(2);
+  const id = (PAGES[raw] && ROLE.menus.indexOf(raw) > -1) ? raw : ROLE.menus[0];
+  const p = PAGES[id];
+  $$('.menu-item').forEach(m => m.classList.toggle('active', m.dataset.id === id));
+  $('#crumb').innerHTML = '工作台&nbsp;/&nbsp;<b>' + p.n + '</b>';
+  $('#view').innerHTML = p.r();
+  if(p.b) p.b();
+  window.scrollTo(0, 0);
+}
+function buildSidebar(){
+  let g = '', html = '';
+  MENUS.filter(m => ROLE.menus.indexOf(m.id) > -1).forEach(m => {
+    if(m.group !== g){ g = m.group; html += '<div class="menu-group">' + m.group + '</div>'; }
+    const label = (m.id === 'profit' && ROLE.profit === 'self') ? '我的分成' : m.name;
+    html += '<div class="menu-item" data-id="' + m.id + '">' + m.icon + '<span>' + label + '</span></div>';
+  });
+  $('#menu').innerHTML = html;
+  $('#menu').onclick = e => {
+    const it = e.target.closest('.menu-item');
+    if(it) location.hash = '#/' + it.dataset.id;
+  };
+}
+
+/* ================= 角色切换（演示权限） ================= */
+function openRoleModal(){
+  openModal('<div class="modal card">' +
+    '<div class="modal-h"><h3>切换演示角色</h3><button class="x-btn" onclick="closeModal()">✕</button></div>' +
+    '<div class="modal-b" style="padding-top:14px">' +
+      Object.keys(ROLES).map(k => {
+        const r = ROLES[k];
+        return '<div class="role-opt' + (k === roleKey ? ' on' : '') + '" data-k="' + k + '">' +
+          '<div class="ra" style="background:' + r.color + '">' + r.avatar + '</div>' +
+          '<div style="flex:1"><b>' + r.uname + ' · ' + r.urole + '</b><p>' + r.desc + '</p></div>' +
+          '<span class="ro-check">✓</span></div>';
+      }).join('') +
+      '<div class="hint" style="margin-top:2px">切换后菜单、可见数据范围与操作按钮将按该角色权限即时刷新</div>' +
+    '</div></div>');
+  $$('.role-opt').forEach(o => o.onclick = () => setRole(o.dataset.k));
+}
+function setRole(k){
+  roleKey = k;
+  ROLE = ROLES[k];
+  $('#u-avatar').textContent = ROLE.avatar;
+  $('#u-avatar').style.background = ROLE.color;
+  $('#u-name').textContent = ROLE.uname;
+  $('#u-role').textContent = ROLE.urole;
+  buildSidebar();
+  closeDrawer();
+  closeModal();
+  nav('dashboard');
+  toast('已切换为「' + ROLE.uname + ' · ' + ROLE.urole + '」视角，菜单与数据已按权限刷新', 'info');
+}
+
+/* ================= 全局事件 ================= */
+buildSidebar();
+window.addEventListener('hashchange', route);
+route();
+
+$('#bell').onclick = () => toast('您有 3 条未读通知：2 张保单即将到期、1 条理赔进度更新', 'info');
+$('#user').onclick = openRoleModal;
+$('#g-search').addEventListener('keydown', e => {
+  if(e.key !== 'Enter') return;
+  const v = e.target.value.trim();
+  crmQ = v;
+  nav('crm');
+  setTimeout(() => {
+    const i = $('#crm-q');
+    if(i){
+      i.value = v;
+      $('#crm-tb').innerHTML = crmRows();
+      if(v) toast('已按「' + v + '」过滤客户列表', 'info');
+    }
+  }, 60);
+});
+$('#drawer-close').onclick = closeDrawer;
+$('#drawer-overlay').onclick = closeDrawer;
+$('#modal-wrap').addEventListener('click', e => { if(e.target.id === 'modal-wrap') closeModal(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeDrawer(); closeModal(); } });
+$('#d-call').onclick = () => toast('演示环境：已模拟拨打电话', 'info');
+$('#d-wx').onclick = () => toast('演示环境：微信提醒已发送', 'success');
+</script>
+</body>
+</html>

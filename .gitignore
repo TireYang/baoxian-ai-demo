@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# 可运行的全栈版本（本仓库只托管静态演示页；如需一起托管，删除下面两行）
+app/
+app/data/
+
+# 依赖与构建产物（如后续把 app/ 纳入仓库）
+node_modules/
+dist/
